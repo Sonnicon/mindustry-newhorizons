@@ -5,7 +5,7 @@
   "description": "Epic mindustry mod",
   "version": "0",
   "main": "sonnicon.newhorizons.Newhorizons",
-  "minGameVersion": "105",
+  "minGameVersion": "121",
   "dependencies": [],
   "hidden": false
 }
