@@ -1,10 +1,10 @@
 {
-  "name": "modtemplate",
-  "displayName": "Template",
+  "name": "newhorizons",
+  "displayName": "New Horizons",
   "author": "[#8738ff[]]Sonnicon[[]]",
-  "description": "Gradle jar Mindustry mod template",
+  "description": "Epic mindustry mod",
   "version": "0",
-  "main": "sonnicon.modtemplate.ModTemplate",
+  "main": "sonnicon.newhorizons.Newhorizons",
   "minGameVersion": "105",
   "dependencies": [],
   "hidden": false

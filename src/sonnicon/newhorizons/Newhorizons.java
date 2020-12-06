@@ -1,8 +1,8 @@
-package sonnicon.modtemplate;
+package sonnicon.newhorizons;
 
 import mindustry.mod.Mod;
 
-public class ModTemplate extends Mod{
+public class Newhorizons extends Mod{
 
     @Override
     public void init(){

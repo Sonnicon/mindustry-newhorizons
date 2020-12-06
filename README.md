@@ -1,5 +1,5 @@
-# Mindustry Mod Template
-A blank template for Mindustry mods with an existing Gradle configuration to compile and dex-ify.
+# New Horizons
+A very WIP Mindustry mod.
 
 ## Compiling
 JDK 8.
