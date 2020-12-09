@@ -27,15 +27,15 @@ public class CrystalBlock extends Block{
         rebuildable = false;
         enableDrawStatus = false;
         expanded = true;
-        //todo
-        absorbLasers = false;
-
+        absorbLasers = true;
         fillsTile = false;
         targetable = false;
         canOverdrive = false;
         hasShadow = false;
         size = 3;
     }
+
+
 
     protected final Random random = new Random();
 
@@ -59,7 +59,8 @@ public class CrystalBlock extends Block{
             BulletType type = other.type();
             if(Types.lasers.contains(other.type())){
                 for(int i = 0; i < 3; i++){
-                    type.create(this, null, x(), y(), random.nextInt(360));
+                    Bullet b = type.create(this, null, x(), y(), random.nextInt(360));
+                    b.time(other.time() * 0.6f);
                 }
             }else{
                 //todo

@@ -1,9 +1,10 @@
 package sonnicon.newhorizons.content;
 
 import arc.Events;
-import mindustry.content.Bullets;
-import mindustry.content.UnitTypes;
+import mindustry.Vars;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.LaserBoltBulletType;
+import mindustry.entities.bullet.LaserBulletType;
 import mindustry.game.EventType;
 import sonnicon.newhorizons.types.IInit;
 
@@ -16,8 +17,14 @@ public class Types implements IInit{
     public void init(){
         Events.on(EventType.ClientLoadEvent.class, event -> {
             lasers = new HashSet<BulletType>(){{
-                //todo
+
             }};
+
+            lasers.addAll(
+                Vars.content.bullets().select(bulletType ->
+                    bulletType instanceof LaserBoltBulletType ||
+                    bulletType instanceof LaserBulletType)
+                .list());
         });
     }
 }
