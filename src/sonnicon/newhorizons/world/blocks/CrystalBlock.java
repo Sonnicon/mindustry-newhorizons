@@ -1,25 +1,18 @@
 package sonnicon.newhorizons.world.blocks;
 
-import arc.math.Rand;
-import mindustry.content.Items;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
-import mindustry.type.Category;
 import mindustry.world.Block;
-import mindustry.world.Tile;
 import sonnicon.newhorizons.content.Types;
 
 import java.util.Random;
-
-import static mindustry.type.ItemStack.with;
 
 public class CrystalBlock extends Block{
 
     public CrystalBlock(String name){
         super(name);
-        requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
         solid = true;
         destructible = true;
         rotate = false;
@@ -34,7 +27,6 @@ public class CrystalBlock extends Block{
         hasShadow = false;
         size = 3;
     }
-
 
 
     protected final Random random = new Random();
