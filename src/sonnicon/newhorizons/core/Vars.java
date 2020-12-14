@@ -1,5 +1,7 @@
 package sonnicon.newhorizons.core;
 
+import mindustry.mod.Mods;
+import sonnicon.newhorizons.Newhorizons;
 import sonnicon.newhorizons.content.Blocks;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.types.IInit;
@@ -13,6 +15,8 @@ public class Vars{
             new Blocks(),
             new Types()
     };
+
+    public static Mods.LoadedMod mod = mindustry.Vars.mods.getMod(Newhorizons.class);
 
     public static void init(){
         Arrays.stream(loadables)

@@ -6,11 +6,12 @@ import mindustry.world.Block;
 import sonnicon.newhorizons.types.ILoadContent;
 import sonnicon.newhorizons.world.blocks.CrystalBlock;
 import sonnicon.newhorizons.world.blocks.MirrorBlock;
+import sonnicon.newhorizons.world.blocks.SemiMirrorBlock;
 
 import static mindustry.type.ItemStack.with;
 
 public class Blocks implements ILoadContent{
-    public Block crystalWhite, mirror;
+    public Block crystalWhite, mirror, semimirror;
 
     @Override
     public void loadContent(){
@@ -19,6 +20,12 @@ public class Blocks implements ILoadContent{
         }};
 
         mirror = new MirrorBlock("mirror"){{
+            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+
+            size = 2;
+        }};
+
+        semimirror = new SemiMirrorBlock("semimirror"){{
             requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
             size = 2;

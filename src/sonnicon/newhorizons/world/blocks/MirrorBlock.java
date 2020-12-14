@@ -9,7 +9,9 @@ import arc.util.io.Writes;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.world.Block;
+import sonnicon.newhorizons.Newhorizons;
 import sonnicon.newhorizons.content.Types;
+import sonnicon.newhorizons.core.Vars;
 
 public class MirrorBlock extends Block{
     public TextureRegion top;
@@ -26,6 +28,8 @@ public class MirrorBlock extends Block{
     @Override
     public void load(){
         super.load();
+        System.out.println(Vars.mod.name + "-mirror");
+        region = Core.atlas.find(Vars.mod.name + "-mirror");
         top = Core.atlas.find(name + "-top");
     }
 
@@ -61,8 +65,8 @@ public class MirrorBlock extends Block{
         @Override
         public boolean collision(Bullet other){
             int angle = (180 - (int) other.deltaAngle()) % 360;
-            if(Types.lasers.contains(other.type()) && distance(setting, angle) < 90){
-                Bullet b = other.type().create(this, null, x(), y(), angle - 2 * setting);
+            if(!Types.lasers.contains(other.type()) && distance(setting, angle) < 90){
+                Bullet b = other.type().create(this, null, other.x(), other.y(), angle - 2 * setting);
                 b.time(other.time());
                 return true;
             }
@@ -84,7 +88,7 @@ public class MirrorBlock extends Block{
         }
     }
 
-    private static int distance(int alpha, int beta) {
+    protected static int distance(int alpha, int beta) {
         int phi = Math.abs(beta - alpha) % 360;
         return phi > 180 ? 360 - phi : phi;
     }
