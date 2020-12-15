@@ -6,10 +6,10 @@ import arc.graphics.g2d.TextureRegion;
 import arc.scene.ui.layout.Table;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.world.Block;
-import sonnicon.newhorizons.Newhorizons;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Vars;
 
@@ -65,10 +65,19 @@ public class MirrorBlock extends Block{
         @Override
         public boolean collision(Bullet other){
             int angle = (180 - (int) other.deltaAngle()) % 360;
-            if(!Types.lasers.contains(other.type()) && distance(setting, angle) < 90){
-                Bullet b = other.type().create(this, null, other.x(), other.y(), angle - 2 * setting);
-                b.time(other.time());
-                return true;
+            BulletType type = other.type();
+            if(Types.lasers.contains(type) && distance(setting, angle) < 90){
+                if(type.collidesTeam){
+                    Bullet b = type.create(this, null, other.x(), other.y(), angle - 2 * setting);
+                    b.time(other.time());
+                    return true;
+                }else{
+                    // Don't create new bullets if not required
+                    other.owner(this);
+                    other.team(null);
+                    other.rotation(angle - 2 * setting);
+                    return false;
+                }
             }
             return super.collision(other);
         }
@@ -88,7 +97,7 @@ public class MirrorBlock extends Block{
         }
     }
 
-    protected static int distance(int alpha, int beta) {
+    protected static int distance(int alpha, int beta){
         int phi = Math.abs(beta - alpha) % 360;
         return phi > 180 ? 360 - phi : phi;
     }
