@@ -52,7 +52,7 @@ public class CrystalBlock extends Block{
             if(Types.lasers.contains(other.type())){
                 for(int i = 0; i < 3; i++){
                     Bullet b = type.create(this, null, x(), y(), random.nextInt(360));
-                    b.time(other.time() * 0.6f);
+                    b.time(other.time() * 0.9f);
                 }
             }else{
                 //todo

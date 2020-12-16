@@ -13,11 +13,10 @@ public class SemiMirrorBlock extends MirrorBlock{
     public class SemiMirrorBlockBuilding extends MirrorBlockBuilding{
         @Override
         public boolean collision(Bullet other){
-
             BulletType type = other.type();
             if(Types.lasers.contains(type)){
                 float time = other.lifetime - (other.lifetime() - other.time()) / 2;
-                int angle = (180 - (int) other.deltaAngle()) % 360;
+                int angle = (180 - (int) other.rotation()) % 360;
 
                 Bullet b = type.create(this, null, other.x(), other.y(), angle - 2 * setting);
                 b.time(time);
