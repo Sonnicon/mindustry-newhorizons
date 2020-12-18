@@ -38,7 +38,11 @@ public class MirrorBlock extends Block{
         region = Core.atlas.find(Vars.mod.name + "-mirror");
         top = Core.atlas.find(name + "-top");
 
-        mirrorHitbox = new Rect().setCentered(0, 0, mindustry.Vars.tilesize / 4f * size, mindustry.Vars.tilesize * size + 2f);
+        mirrorHitbox = mirrorHitbox();
+    }
+
+    protected Rect mirrorHitbox(){
+        return new Rect().setCentered(0, 0, mindustry.Vars.tilesize / 4f * size, mindustry.Vars.tilesize * size + 2f);
     }
 
     public class MirrorBlockBuilding extends Building{

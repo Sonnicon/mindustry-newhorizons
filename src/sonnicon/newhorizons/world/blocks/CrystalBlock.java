@@ -31,8 +31,8 @@ public class CrystalBlock extends Block{
 
     protected final Random random = new Random();
 
-    public class CrystalBlockBuild extends Building{
-        public CrystalBlockBuild(){
+    public class CrystalBlockBuilding extends Building{
+        public CrystalBlockBuilding(){
             super();
         }
 
