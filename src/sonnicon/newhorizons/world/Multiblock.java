@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static mindustry.Vars.world;
+
 public class Multiblock{
     public final Block resultBlock;
     public final List<RelativeBlock> blocks;
@@ -55,6 +57,16 @@ public class Multiblock{
         });
 
         return true;
+    }
+
+    public void remove(Tile origin){
+        Tile t;
+        for(RelativeBlock b : blocks){
+            t = b.fetch(origin);
+            setTileBlock(t, Blocks.air);
+            t.build = null;
+            world.notifyChanged(t);
+        }
     }
 
     void setTileBlock(Tile tile, Block block){
