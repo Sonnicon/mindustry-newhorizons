@@ -1,4 +1,10 @@
 # New Horizons
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Sonnicon/mindustry-newhorizons/Java%20CI%20with%20Gradle?style=for-the-badge) 
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Sonnicon/mindustry-newhorizons?style=for-the-badge) 
+![GitHub](https://img.shields.io/github/license/Sonnicon/mindustry-newhorizons?style=for-the-badge)\
+[![forthebadge](https://forthebadge.com/images/badges/made-with-crayons.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/uses-badges.svg)](https://forthebadge.com)
+
 A very WIP Mindustry mod.
 
 ## Compiling
