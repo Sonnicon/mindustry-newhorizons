@@ -11,20 +11,14 @@ import sonnicon.newhorizons.types.IInit;
 import java.util.HashSet;
 
 public class Types implements IInit{
-    public static HashSet<BulletType> lasers;
+    public static final HashSet<BulletType> lasers = new HashSet<>();
 
     @Override
     public void init(){
-        Events.on(EventType.ClientLoadEvent.class, event -> {
-            lasers = new HashSet<BulletType>(){{
-
-            }};
-
-            lasers.addAll(
-                Vars.content.bullets().select(bulletType ->
-                    bulletType instanceof LaserBoltBulletType ||
-                    bulletType instanceof LaserBulletType)
-                .list());
-        });
+        Events.on(EventType.ClientLoadEvent.class, event -> lasers.addAll(
+            Vars.content.bullets().select(bulletType ->
+                bulletType instanceof LaserBoltBulletType ||
+                bulletType instanceof LaserBulletType)
+            .list()));
     }
 }

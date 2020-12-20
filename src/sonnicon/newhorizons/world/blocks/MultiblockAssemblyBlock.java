@@ -15,6 +15,7 @@ public class MultiblockAssemblyBlock extends Block{
         destructible = true;
         solid = true;
         rotate = true;
+        consumesTap = true;
     }
 
     public class MultiblockAssemblyBlockBuilding extends Building{

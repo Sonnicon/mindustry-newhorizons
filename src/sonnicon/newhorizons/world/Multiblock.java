@@ -7,6 +7,7 @@ import mindustry.world.Tile;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,16 +17,13 @@ public class Multiblock{
     public final Block resultBlock;
     public final List<RelativeBlock> blocks;
 
-    protected static Block controllerBlock;
-    public static HashMap<Block, Multiblock> multiblocks = new HashMap<>();
+    public static final HashMap<Block, Multiblock> multiblocks = new HashMap<>();
 
-    protected static ArrayList<Tile> temp = new ArrayList<>();
+    protected static final ArrayList<Tile> temp = new ArrayList<>();
     protected static Field blockField;
 
-    public static void setControllerBlock(Block block){
-        if(controllerBlock == null){
-            controllerBlock = block;
-        }
+    public Multiblock(Block resultBlock, RelativeBlock... blocks){
+        this(resultBlock, Arrays.asList(blocks));
     }
 
     public Multiblock(Block resultBlock, List<RelativeBlock> blocks){
