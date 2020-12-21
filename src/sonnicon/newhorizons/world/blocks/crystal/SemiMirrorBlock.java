@@ -1,4 +1,4 @@
-package sonnicon.newhorizons.world.blocks;
+package sonnicon.newhorizons.world.blocks.crystal;
 
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;

@@ -1,4 +1,4 @@
-package sonnicon.newhorizons.world.blocks;
+package sonnicon.newhorizons.world.blocks.crystal;
 
 import arc.Core;
 import arc.graphics.g2d.Draw;
