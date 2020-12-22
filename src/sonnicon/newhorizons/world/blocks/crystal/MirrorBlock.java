@@ -88,7 +88,6 @@ public class MirrorBlock extends Block{
         @Override
         public boolean collision(Bullet other){
             int bRotation = (180 - (int) other.rotation()) % 360;
-
             BulletType type = other.type();
             if(Types.lasers.contains(type) && distance(setting, bRotation) < 90){
                 int bounceAngle = bRotation - 2 * setting;
@@ -108,17 +107,17 @@ public class MirrorBlock extends Block{
         }
 
         @Override
-        public void readAll(Reads read, byte revision){
-            super.readAll(read, revision);
-
-            setting = read.i();
-        }
-
-        @Override
         public void write(Writes write){
             super.write(write);
 
             write.i(setting);
+        }
+
+        @Override
+        public void read(Reads read){
+            super.read(read);
+
+            setting = read.i();
         }
     }
 

@@ -5,6 +5,7 @@ import mindustry.type.Category;
 import mindustry.world.Block;
 import sonnicon.newhorizons.types.ILoadContent;
 import sonnicon.newhorizons.world.blocks.crystal.CrystalBlock;
+import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
 import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
 import sonnicon.newhorizons.world.blocks.MultiblockAssemblyBlock;
 import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
@@ -13,7 +14,7 @@ import sonnicon.newhorizons.world.blocks.defence.GlassWallBlock;
 import static mindustry.type.ItemStack.with;
 
 public class Blocks implements ILoadContent{
-    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall;
+    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser;
 
     @Override
     public void loadContent(){
@@ -42,6 +43,10 @@ public class Blocks implements ILoadContent{
             hasShadow = false;
             fillsTile = false;
             health = 100;
+        }};
+
+        laserCondenser = new LaserCondenserBlock("lasercondenser"){{
+
         }};
     }
 }

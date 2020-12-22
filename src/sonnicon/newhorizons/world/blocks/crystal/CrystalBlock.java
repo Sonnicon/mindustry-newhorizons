@@ -1,5 +1,7 @@
 package sonnicon.newhorizons.world.blocks.crystal;
 
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
@@ -25,6 +27,7 @@ public class CrystalBlock extends Block{
         targetable = false;
         canOverdrive = false;
         hasShadow = false;
+        sync = true;
         size = 3;
     }
 
@@ -63,6 +66,17 @@ public class CrystalBlock extends Block{
         @Override
         public void damage(float damage){
             tile.setTeam(Team.derelict);
+        }
+
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+        }
+
+        @Override
+        public void read(Reads read){
+            super.read(read);
         }
     }
 }

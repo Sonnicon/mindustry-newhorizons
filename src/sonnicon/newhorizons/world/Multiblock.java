@@ -6,16 +6,15 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.ToIntFunction;
 
 import static mindustry.Vars.world;
 
 public class Multiblock{
     public final Block resultBlock;
     public final List<RelativeBlock> blocks;
+    public float drawOffsetX, drawOffsetY;
 
     public static final HashMap<Block, Multiblock> multiblocks = new HashMap<>();
 
@@ -30,6 +29,11 @@ public class Multiblock{
         this.resultBlock = resultBlock;
         this.blocks = blocks;
 
+        // (max + min) / 2
+        drawOffsetX = (blocks.stream().max(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x +
+                blocks.stream().min(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x) / 2f;
+        drawOffsetY = (blocks.stream().max(Comparator.comparingInt(x -> x.y)).orElseThrow(NoSuchElementException::new).y +
+                blocks.stream().min(Comparator.comparingInt(x -> x.y)).orElseThrow(NoSuchElementException::new).y) / 2f;
         multiblocks.put(resultBlock, this);
     }
 
