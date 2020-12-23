@@ -15,6 +15,8 @@ import mindustry.world.Block;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Vars;
 
+import static sonnicon.newhorizons.core.Util.distance;
+
 public class MirrorBlock extends Block{
     protected TextureRegion top;
     protected Rect mirrorHitbox;
@@ -119,10 +121,5 @@ public class MirrorBlock extends Block{
 
             setting = read.i();
         }
-    }
-
-    protected static int distance(int alpha, int beta){
-        int phi = Math.abs(beta - alpha) % 360;
-        return phi > 180 ? 360 - phi : phi;
     }
 }
