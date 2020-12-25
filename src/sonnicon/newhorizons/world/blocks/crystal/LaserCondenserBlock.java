@@ -1,21 +1,15 @@
 package sonnicon.newhorizons.world.blocks.crystal;
 
-import arc.Core;
-import arc.Events;
-import arc.graphics.g2d.Draw;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
-import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Bullet;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
 import mindustry.world.Block;
-import mindustry.world.Tile;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
+import sonnicon.newhorizons.entities.PowerBeam;
 import sonnicon.newhorizons.world.MultiblockBuilding;
 
 import java.util.ArrayList;
@@ -34,29 +28,19 @@ public class LaserCondenserBlock extends Block{
     public void load(){
         super.load();
 
-        Events.on(EventType.TileChangeEvent.class, tile -> {
-            recalculateBeams();
-        });
-    }
-
-    public void recalculateBeams(){
-        buildings.forEach(b -> b.length = -1);
     }
 
     // collision distance from center
     protected float distance = Vars.tilesize * 1.5f;
-    protected final ArrayList<LaserCondenserBlockBuilding> buildings = new ArrayList<>();
 
     public class LaserCondenserBlockBuilding extends MultiblockBuilding{
         public float energy = 0f;
         public float time = 0f;
 
-        //caching for draw()
-        public float length = -1;
+        public PowerBeam beam;
 
         @Override
         public void updateTile(){
-            System.out.println(length);
             team(Team.derelict);
 
             time += Time.delta;
@@ -64,37 +48,11 @@ public class LaserCondenserBlock extends Block{
                 time /= 2f;
                 energy /= 2f;
             }
-
-            if(length < 0f){
-                Tile t1 = Vars.world.tileWorld(x, y);
-                Tile t2;
-                while(true){
-                    t2 = t1.nearby(rotation);
-                    if(t2 == null || t2.block().absorbLasers){
-                        length = t1.x * Vars.tilesize - x;
-                        break;
-                    }
-                    t1 = t2;
-                }
-            }
         }
 
         @Override
         public void draw(){
             super.draw();
-
-            if(length < 0f) return;
-            Draw.z(Layer.power);
-            Drawf.laser(null,
-                    Core.atlas.find("blank"),
-                    Core.atlas.find("blank"),
-                    //todo optimise
-                    x + (int) Math.cos(rotation) * distance,
-                    y + (int) Math.sin(rotation) * distance,
-                    x + (int) Math.cos(rotation) * length,
-                    y + (int) Math.sin(rotation) * length,
-                    1);
-            Draw.reset();
         }
 
         @Override
@@ -136,13 +94,14 @@ public class LaserCondenserBlock extends Block{
         @Override
         public void created(){
             super.created();
-            buildings.add(this);
         }
 
         @Override
         public void onRemoved(){
             super.onRemoved();
-            buildings.add(this);
+            if(beam != null){
+                beam.remove();
+            }
         }
 
         @Override
