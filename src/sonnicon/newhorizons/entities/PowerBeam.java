@@ -3,7 +3,6 @@ package sonnicon.newhorizons.entities;
 import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
-import arc.math.Mathf;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.graphics.Drawf;
@@ -15,8 +14,7 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PowerBeam{
-    public float x, y, rotation;
-    public boolean on = true;
+    public float x, y, rotation, power = 0f;
 
     protected PowerBeam childBeam;
     protected static ArrayList<PowerBeam> beams = new ArrayList<>();
@@ -36,11 +34,6 @@ public class PowerBeam{
         this.rotation = rotation % 360f;
         beams.add(this);
         recalculate();
-    }
-
-    public PowerBeam(float x, float y, float rotation, boolean on){
-        this(x, y, rotation);
-        this.on = on;
     }
 
     public static void recalculateAll(){
@@ -93,19 +86,31 @@ public class PowerBeam{
         if(length < 0f){
             recalculate();
         }
+
+        if(power < 0.0001f){
+            power = 0f;
+            return;
+        }
+
         // todo damage
     }
 
     public void draw(){
-        if(length < 0f) return;
+        if(length < 0f || !on()) return;
         //todo make shader work
         Draw.draw(Layer.end, () ->
-                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, 1)
+                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
         );
     }
 
+    public boolean on(){
+        return power > 0f;
+    }
+
     public void remove(){
-        childBeam.remove();
+        if(childBeam != null){
+            childBeam.remove();
+        }
         beams.remove(this);
     }
 }

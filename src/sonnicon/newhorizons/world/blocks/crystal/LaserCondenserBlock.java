@@ -10,9 +10,8 @@ import mindustry.world.Block;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.entities.PowerBeam;
+import sonnicon.newhorizons.types.Pair;
 import sonnicon.newhorizons.world.MultiblockBuilding;
-
-import java.util.ArrayList;
 
 public class LaserCondenserBlock extends Block{
     public LaserCondenserBlock(String name){
@@ -32,6 +31,7 @@ public class LaserCondenserBlock extends Block{
 
     // collision distance from center
     protected float distance = Vars.tilesize * 1.5f;
+    protected final Pair<Float> temp = new Pair<>();
 
     public class LaserCondenserBlockBuilding extends MultiblockBuilding{
         public float energy = 0f;
@@ -44,10 +44,11 @@ public class LaserCondenserBlock extends Block{
             team(Team.derelict);
 
             time += Time.delta;
-            if(time >= 8f){
+            if(time >= 2f){
                 time /= 2f;
                 energy /= 2f;
             }
+            beam.power = energy;
         }
 
         @Override
@@ -61,7 +62,7 @@ public class LaserCondenserBlock extends Block{
                     isOutsideDirection(other.x() - other.deltaX(), other.y() - other.deltaY())){
                 if(Types.lasers.contains(other.type())){
                     //todo balancing
-                    energy += (other.lifetime() - other.time()) * other.type().damage * 0.25;
+                    energy += (other.lifetime() - other.time()) * other.type().damage * 0.05;
                 }else{
                     //todo
                 }
@@ -94,6 +95,8 @@ public class LaserCondenserBlock extends Block{
         @Override
         public void created(){
             super.created();
+            Util.blockRotationOffset(temp, x, y, distance, rotation());
+            this.beam = new PowerBeam(temp.getX(), temp.getY(), rotation());
         }
 
         @Override

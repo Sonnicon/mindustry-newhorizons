@@ -31,7 +31,7 @@ public class MirrorBlock extends Block{
         destructible = true;
         solid = true;
 
-        config(Integer.class, (MirrorBlockBuilding building, Integer value) -> building.setting = value);
+        config(Float.class, (MirrorBlockBuilding building, Float value) -> building.setting = value);
     }
 
     @Override
@@ -48,27 +48,28 @@ public class MirrorBlock extends Block{
     }
 
     public class MirrorBlockBuilding extends Building{
-        protected int setting = 0;
+        protected float setting = 0;
 
         @Override
         public void draw(){
             super.draw();
-            Draw.rect(top, tile.drawx(), tile.drawy(), -setting);
+            Draw.rect(top, tile.drawx(), tile.drawy(), -config());
         }
 
         @Override
         public void configure(Object value){
-            super.configure((int) value % 360);
+            setting = (float) value % 360f;
+            super.configure(setting);
         }
 
         @Override
-        public Object config(){
+        public Float config(){
             return setting;
         }
 
         @Override
         public void buildConfiguration(Table table){
-            table.field(String.valueOf(setting), (textField, c) -> Character.isDigit(c), input -> configure(Integer.parseInt("0" + input)));
+            table.field(String.valueOf(config()), (textField, c) -> Character.isDigit(c), input -> configure(Float.parseFloat("0" + input)));
         }
 
         @Override
@@ -81,18 +82,18 @@ public class MirrorBlock extends Block{
             tmp2 = tmp.getCenter(tmp2);
             float relX = other.getX() - tmp2.x,
                     relY = other.getY() - tmp2.y;
-            float transX = (float) (relX * Math.cos(-setting) - relY * Math.sin(-setting)),
-                    transY = (float) (relX * Math.sin(-setting) + relY * Math.cos(-setting));
+            float transX = (float) (relX * Math.cos(-config()) - relY * Math.sin(-config())),
+                    transY = (float) (relX * Math.sin(-config()) + relY * Math.cos(-config()));
 
             return mirrorHitbox.contains(transX, transY);
         }
 
         @Override
         public boolean collision(Bullet other){
-            int bRotation = (180 - (int) other.rotation()) % 360;
+            float bRotation = (180f - other.rotation()) % 360f;
             BulletType type = other.type();
-            if(Types.lasers.contains(type) && distance(setting, bRotation) < 90){
-                int bounceAngle = bRotation - 2 * setting;
+            if(Types.lasers.contains(type) && distance(config(), bRotation) < 90f){
+                float bounceAngle = bRotation - 2f * config();
                 if(type.collidesTeam){
                     Bullet b = type.create(this, null, other.x(), other.y(), bounceAngle);
                     b.time(other.time());
@@ -112,14 +113,14 @@ public class MirrorBlock extends Block{
         public void write(Writes write){
             super.write(write);
 
-            write.i(setting);
+            write.f(config());
         }
 
         @Override
-        public void read(Reads read){
-            super.read(read);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
 
-            setting = read.i();
+            setting = read.f();
         }
     }
 }

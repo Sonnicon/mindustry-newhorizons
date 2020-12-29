@@ -62,7 +62,7 @@ public class MultiblockAssemblyBlock extends Block{
         }
 
         @Override
-        public Object config(){
+        public Multiblock config(){
             return selected;
         }
     }

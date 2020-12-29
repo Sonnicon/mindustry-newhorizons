@@ -1,11 +1,9 @@
 package sonnicon.newhorizons.world;
 
-import arc.graphics.g2d.Draw;
 import mindustry.Vars;
 import mindustry.gen.Building;
 
 public class MultiblockBuilding extends Building{
-
 
     @Override
     public void created(){
