@@ -50,7 +50,9 @@ public class MultiblockAssemblyBlock extends Block{
                 })).width(320f).height(400f);
                 dialog.show();
             }else{
-                if(!selected.place(tile())){
+                if(selected.verify(tile())){
+                    tile().setBlock(selected.resultBlock, team(), rotation());
+                }else{
                     selected = null;
                 }
             }

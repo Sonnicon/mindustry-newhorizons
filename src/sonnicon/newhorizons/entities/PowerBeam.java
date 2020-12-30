@@ -24,6 +24,11 @@ public class PowerBeam{
 
     public static void init(){
         Events.on(EventType.TileChangeEvent.class, tile -> recalculateAll(tile.tile));
+        Events.on(EventType.ResetEvent.class, event -> {
+            while(!beams.isEmpty()){
+                beams.get(0).remove();
+            }
+        });
         Events.run(EventType.Trigger.update, () -> beams.forEach(PowerBeam::update));
         Events.run(EventType.Trigger.draw, () -> beams.forEach(PowerBeam::draw));
     }

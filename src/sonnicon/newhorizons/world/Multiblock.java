@@ -7,7 +7,6 @@ import mindustry.world.Tile;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.ToIntFunction;
 
 import static mindustry.Vars.world;
 
@@ -51,11 +50,14 @@ public class Multiblock{
             t.setBlock(Blocks.air);
             temp.add(t);
         }
+        if(origin.block() != resultBlock){
+            origin.setBlock(resultBlock, origin.team(), origin.build.rotation());
+        }
 
-        origin.setBlock(resultBlock, origin.team(), origin.build.rotation());
         temp.forEach(tile -> {
-            tile.build = origin.build;
             setTileBlock(tile, resultBlock);
+            tile.build = origin.build;
+
         });
 
         return true;

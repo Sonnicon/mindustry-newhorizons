@@ -7,6 +7,7 @@ import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.gen.Bullet;
 import mindustry.world.Block;
+import mindustry.world.consumers.ConsumeLiquidFilter;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.entities.PowerBeam;
@@ -23,18 +24,23 @@ public class LaserCondenserBlock extends Block{
         solid = true;
         rotate = true;
         update = true;
+        hasLiquids = true;
+        //todo balance
+        liquidCapacity = 20f;
+        consumes.add(new ConsumeLiquidFilter(l -> l.temperature <= 0.5f, 0.04f)).update(false);
     }
 
     @Override
     public void load(){
         super.load();
-
     }
 
     // collision distance from center
     protected float distance = Vars.tilesize * 1.5f;
     protected final Pair<Float, Float> temp = new Pair<>();
     protected final LinkedList<LinkedList<Pair<Float, Float>>> energiesPool = new LinkedList<>();
+
+    protected static final int meanSize = 40;
 
     public class LaserCondenserBlockBuilding extends MultiblockBuilding{
         protected float energy = 0f;
@@ -51,7 +57,6 @@ public class LaserCondenserBlock extends Block{
             float mean = (float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum());
             beam.power = mean;
             energy = 0;
-            //todo consume coolant
         }
 
         @Override
@@ -61,17 +66,24 @@ public class LaserCondenserBlock extends Block{
 
         @Override
         public boolean collision(Bullet other){
-            if(Util.distance(other.rotation(), rotation() * 90f) < 90f &&
+            if(efficiency() > 0f && Util.distance(other.rotation(), rotation() * 90f) < 90f &&
                     isOutsideDirection(other.x() - other.deltaX(), other.y() - other.deltaY())){
                 if(Types.lasers.contains(other.type())){
                     //todo balancing
-                    energy += (other.lifetime() - other.time()) * other.type().damage * 0.005;
+                    float bulletEnergy = (other.lifetime() - other.time()) * other.type().damage * 0.005f;
+                    // here instead of updateTile() to punish bullet spam, hence decreasing amount of bullets
+                    if(consValid()){
+                        consume();
+                        bulletEnergy -= bulletEnergy * liquidCapacity / (liquids().total() * 2);
+                    }else{
+                        super.collision(other);
+                    }
+                    energy += bulletEnergy;
                 }else{
                     //todo
                 }
                 return true;
             }
-
             return super.collision(other);
         }
 
@@ -104,7 +116,7 @@ public class LaserCondenserBlock extends Block{
 
             if(energiesPool.isEmpty()){
                 energies = new LinkedList<>();
-                for(int i = 0; i < 40; i++){
+                for(int i = 0; i < meanSize; i++){
                     energies.add(new Pair<>(0f, 0f));
                 }
             }else{
@@ -127,11 +139,18 @@ public class LaserCondenserBlock extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
+
+            // save average instead of true values to save memory
+            write.f((float) energies.stream().mapToDouble(Pair::getX).sum() / meanSize);
+            write.f((float) energies.stream().mapToDouble(Pair::getY).sum() / meanSize);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+
+            float x = read.f(), y = read.f();
+            energies.forEach(pair -> pair.set(x, y));
         }
     }
 }
