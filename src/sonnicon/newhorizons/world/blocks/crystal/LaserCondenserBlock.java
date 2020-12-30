@@ -13,6 +13,8 @@ import sonnicon.newhorizons.entities.PowerBeam;
 import sonnicon.newhorizons.types.Pair;
 import sonnicon.newhorizons.world.MultiblockBuilding;
 
+import java.util.LinkedList;
+
 public class LaserCondenserBlock extends Block{
     public LaserCondenserBlock(String name){
         super(name);
@@ -31,24 +33,25 @@ public class LaserCondenserBlock extends Block{
 
     // collision distance from center
     protected float distance = Vars.tilesize * 1.5f;
-    protected final Pair<Float> temp = new Pair<>();
+    protected final Pair<Float, Float> temp = new Pair<>();
+    protected final LinkedList<LinkedList<Pair<Float, Float>>> energiesPool = new LinkedList<>();
 
     public class LaserCondenserBlockBuilding extends MultiblockBuilding{
-        public float energy = 0f;
-        public float time = 0f;
+        protected float energy = 0f;
+        protected LinkedList<Pair<Float, Float>> energies;
 
         public PowerBeam beam;
 
         @Override
         public void updateTile(){
+            //todo remove
             team(Team.derelict);
 
-            time += Time.delta;
-            if(time >= 2f){
-                time /= 2f;
-                energy /= 2f;
-            }
-            beam.power = energy;
+            energies.addLast(energies.pop().set(Time.delta, energy * Time.delta));
+            float mean = (float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum());
+            beam.power = mean;
+            energy = 0;
+            //todo consume coolant
         }
 
         @Override
@@ -62,7 +65,7 @@ public class LaserCondenserBlock extends Block{
                     isOutsideDirection(other.x() - other.deltaX(), other.y() - other.deltaY())){
                 if(Types.lasers.contains(other.type())){
                     //todo balancing
-                    energy += (other.lifetime() - other.time()) * other.type().damage * 0.05;
+                    energy += (other.lifetime() - other.time()) * other.type().damage * 0.005;
                 }else{
                     //todo
                 }
@@ -95,32 +98,40 @@ public class LaserCondenserBlock extends Block{
         @Override
         public void created(){
             super.created();
+
             Util.blockRotationOffset(temp, x, y, distance, rotation());
             this.beam = new PowerBeam(temp.getX(), temp.getY(), rotation());
+
+            if(energiesPool.isEmpty()){
+                energies = new LinkedList<>();
+                for(int i = 0; i < 40; i++){
+                    energies.add(new Pair<>(0f, 0f));
+                }
+            }else{
+                energies = energiesPool.pop();
+                energies.forEach(pair -> pair.set(0f, 0f));
+            }
         }
 
         @Override
         public void onRemoved(){
             super.onRemoved();
+
             if(beam != null){
                 beam.remove();
             }
+
+            energiesPool.add(energies);
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-
-            write.f(energy);
-            write.f(time);
         }
 
         @Override
-        public void read(Reads read){
-            super.read(read);
-
-            energy = read.f();
-            time = read.f();
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
         }
     }
 }

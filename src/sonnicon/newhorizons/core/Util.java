@@ -9,7 +9,7 @@ public class Util{
         return c > 180f ? 360f - c : c;
     }
 
-    public static Pair<Float> blockRotationOffset(Pair<Float> output, float x, float y, float distance, int rotation){
+    public static Pair<Float, Float> blockRotationOffset(Pair<Float, Float> output, float x, float y, float distance, int rotation){
         // could use trigonometric functions, but this is faster for block rotations
         switch(rotation % 4){
             case (0):{

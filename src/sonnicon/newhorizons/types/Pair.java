@@ -1,16 +1,16 @@
 package sonnicon.newhorizons.types;
 
-public class Pair<T>{
+public class Pair<T, S>{
     protected T x;
-    protected T y;
+    protected S y;
 
     public Pair(){}
 
-    public Pair(T x, T y){
+    public Pair(T x, S y){
         set(x, y);
     }
 
-    public Pair<T> setX(T x){
+    public Pair<T, S> setX(T x){
         this.x = x;
         return this;
     }
@@ -19,16 +19,16 @@ public class Pair<T>{
         return this.x;
     }
 
-    public Pair<T> setY(T y){
+    public Pair<T, S> setY(S y){
         this.y = y;
         return this;
     }
 
-    public T getY(){
+    public S getY(){
         return this.y;
     }
 
-    public Pair<T> set(T x, T y){
+    public Pair<T, S> set(T x, S y){
         setX(x);
         setY(y);
         return this;

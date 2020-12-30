@@ -87,7 +87,7 @@ public class PowerBeam{
             recalculate();
         }
 
-        if(power < 0.0001f){
+        if(power < 0.001f){
             power = 0f;
             return;
         }
