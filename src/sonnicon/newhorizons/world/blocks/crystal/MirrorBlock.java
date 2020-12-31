@@ -14,6 +14,7 @@ import mindustry.gen.Bullet;
 import mindustry.world.Block;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Vars;
+import sonnicon.newhorizons.entities.PowerBeam;
 
 import static sonnicon.newhorizons.core.Util.distance;
 
@@ -60,6 +61,7 @@ public class MirrorBlock extends Block{
         public void configure(Object value){
             setting = (float) value % 360f;
             super.configure(setting);
+            PowerBeam.recalculateAll(tile());
         }
 
         @Override

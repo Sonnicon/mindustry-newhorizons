@@ -4,7 +4,6 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
-import mindustry.game.Team;
 import mindustry.gen.Bullet;
 import mindustry.world.Block;
 import mindustry.world.consumers.ConsumeLiquidFilter;
@@ -50,12 +49,8 @@ public class LaserCondenserBlock extends Block{
 
         @Override
         public void updateTile(){
-            //todo remove
-            team(Team.derelict);
-
             energies.addLast(energies.pop().set(Time.delta, energy * Time.delta));
-            float mean = (float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum());
-            beam.power = mean;
+            beam.setPower((float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum()));
             energy = 0;
         }
 
@@ -108,11 +103,11 @@ public class LaserCondenserBlock extends Block{
         }
 
         @Override
-        public void created(){
-            super.created();
+        public void unbiasedCreated(){
+            super.unbiasedCreated();
 
             Util.blockRotationOffset(temp, x, y, distance, rotation());
-            this.beam = new PowerBeam(temp.getX(), temp.getY(), rotation());
+            this.beam = new PowerBeam(temp.getX(), temp.getY(), (4 - rotation()) * 90f, true);
 
             if(energiesPool.isEmpty()){
                 energies = new LinkedList<>();

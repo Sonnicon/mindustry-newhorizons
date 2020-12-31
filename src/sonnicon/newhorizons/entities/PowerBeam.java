@@ -8,6 +8,9 @@ import mindustry.game.EventType;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
+import sonnicon.newhorizons.core.Util;
+import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
+import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,6 +20,9 @@ public class PowerBeam{
     public float x, y, rotation, power = 0f;
 
     protected PowerBeam childBeam;
+    protected boolean parent = true;
+
+    protected static ArrayList<PowerBeam> beamsParents = new ArrayList<>();
     protected static ArrayList<PowerBeam> beams = new ArrayList<>();
     // caching
     protected float length, endX, endY;
@@ -29,16 +35,31 @@ public class PowerBeam{
                 beams.get(0).remove();
             }
         });
-        Events.run(EventType.Trigger.update, () -> beams.forEach(PowerBeam::update));
+        Events.run(EventType.Trigger.update, () -> beamsParents.forEach(PowerBeam::update));
         Events.run(EventType.Trigger.draw, () -> beams.forEach(PowerBeam::draw));
     }
 
-    public PowerBeam(float x, float y, float rotation){
+    public PowerBeam(float x, float y, float rotation, boolean parent){
+        set(x, y, rotation, parent);
+        beams.add(this);
+        if(parent){
+            beamsParents.add(this);
+        }
+    }
+
+    public void set(float x, float y, float rotation, boolean parent){
         this.x = x;
         this.y = y;
         this.rotation = rotation % 360f;
-        beams.add(this);
-        recalculate();
+        this.parent = parent;
+        length = 0;
+    }
+
+    public void setPower(float power){
+        this.power = power;
+        if(childBeam != null){
+            childBeam.setPower(power);
+        }
     }
 
     public static void recalculateAll(){
@@ -47,8 +68,8 @@ public class PowerBeam{
 
     public static void recalculateAll(Tile tile){
         beams.forEach(beam -> {
-            if(tile == null || beam.enroute.contains(tile)){
-                beam.recalculate();
+            if(tile == null || (beam.enroute.contains(tile))){
+                beam.length = 0f;
             }
         });
     }
@@ -65,6 +86,7 @@ public class PowerBeam{
         if(rotation + 45f % 90f == 0 && distanceX > distanceY){
             distanceX = 0f;
         }
+
         if(rotation % 90 != 0){
             final double tan = Math.tan(Math.toRadians(rotation));
             if(distanceX == 0f){
@@ -73,23 +95,52 @@ public class PowerBeam{
                 distanceY = (float) tan * -distanceX;
             }
         }
+
         AtomicReference<Tile> last = new AtomicReference<>();
         enroute.clear();
+        Tile origin = Vars.world.tileWorld(x, y);
         Vars.world.raycastEachWorld(x, y, x + distanceX, y + distanceY, (rx, ry) -> {
             Tile rt = Vars.world.tile(rx, ry);
             if(rt == null) return true;
-            enroute.add(rt);
+            rt.getLinkedTiles(t -> enroute.add(t));
             last.set(rt);
-            return rt.block().absorbLasers;
+            return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
         });
+
         endX = last.get().worldx();
         endY = last.get().worldy();
-        length = (endX - x) / (float) Math.cos(Math.toRadians(rotation));
+        if(endX == x){
+            length = (endY - y) / (float) Math.sin(Math.toRadians(rotation));
+        }else{
+            length = (endX - x) / (float) Math.cos(Math.toRadians(rotation));
+        }
+        length = Math.abs(length);
+
+        Tile t = last.get();
+        if(canReflectMirror(t)){
+            if(childBeam == null){
+                childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, false);
+            }else{
+                childBeam.set(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, false);
+            }
+        }else if(childBeam != null){
+            childBeam.remove();
+            childBeam = null;
+        }
+    }
+
+    protected boolean canReflectMirror(Tile tile){
+        return tile.block() instanceof SemiMirrorBlock ||
+                (tile.block() instanceof MirrorBlock && Util.distance(180f - rotation, (Float) tile.build.config()) < 90f);
     }
 
     public void update(){
-        if(length < 0f){
+        if(length <= 0f){
             recalculate();
+        }
+
+        if(childBeam != null){
+            childBeam.update();
         }
 
         if(power < 0.001f){
@@ -101,10 +152,10 @@ public class PowerBeam{
     }
 
     public void draw(){
-        if(length < 0f || !on()) return;
+        //if(length < 0f || !on()) return;
         //todo make shader work
         Draw.draw(Layer.end, () ->
-                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
+                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, 0.5f)//power)
         );
     }
 
@@ -117,5 +168,8 @@ public class PowerBeam{
             childBeam.remove();
         }
         beams.remove(this);
+        if(parent){
+            beamsParents.remove(this);
+        }
     }
 }
