@@ -101,8 +101,14 @@ public class PowerBeam{
         Tile origin = Vars.world.tileWorld(x, y);
         Vars.world.raycastEachWorld(x, y, x + distanceX, y + distanceY, (rx, ry) -> {
             Tile rt = Vars.world.tile(rx, ry);
-            if(rt == null) return true;
-            rt.getLinkedTiles(t -> enroute.add(t));
+            if(rt == null || rt == origin) return true;
+            if(rt.block().hasBuilding()){
+                rt.build.tile().getLinkedTiles(t -> {
+                    enroute.add(t);
+                });
+            }else{
+                enroute.add(rt);
+            }
             last.set(rt);
             return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
         });
@@ -118,6 +124,7 @@ public class PowerBeam{
 
         Tile t = last.get();
         if(canReflectMirror(t)){
+            System.out.println(((float) t.build.config()) * 2f - rotation + 180f);
             if(childBeam == null){
                 childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, false);
             }else{
@@ -131,7 +138,7 @@ public class PowerBeam{
 
     protected boolean canReflectMirror(Tile tile){
         return tile.block() instanceof SemiMirrorBlock ||
-                (tile.block() instanceof MirrorBlock && Util.distance(180f - rotation, (Float) tile.build.config()) < 90f);
+                (tile.block() instanceof MirrorBlock && Util.distance(rotation - 180f, (Float) tile.build.config()) < 90f);
     }
 
     public void update(){
@@ -152,11 +159,13 @@ public class PowerBeam{
     }
 
     public void draw(){
-        //if(length < 0f || !on()) return;
+        if(length < 0f || !on()) return;
         //todo make shader work
         Draw.draw(Layer.end, () ->
-                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, 0.5f)//power)
+                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
         );
+
+
     }
 
     public boolean on(){
