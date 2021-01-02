@@ -5,6 +5,7 @@ import arc.Events;
 import arc.graphics.g2d.Draw;
 import mindustry.Vars;
 import mindustry.game.EventType;
+import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
@@ -30,6 +31,7 @@ public class PowerBeam{
 
     public static void init(){
         Events.on(EventType.TileChangeEvent.class, tile -> recalculateAll(tile.tile));
+        // they would stick around after loading another save
         Events.on(EventType.ResetEvent.class, event -> {
             while(!beams.isEmpty()){
                 beams.get(0).remove();
@@ -69,13 +71,15 @@ public class PowerBeam{
     public static void recalculateAll(Tile tile){
         beams.forEach(beam -> {
             if(tile == null || (beam.enroute.contains(tile))){
-                beam.length = 0f;
+                beam.invalidate();
             }
         });
     }
 
     public void recalculate(){
         // this was a nightmare because I didn't know the trigonometric functions took radians
+
+        // distance to axis
         float distanceX = 0f, distanceY = 0f;
         if((rotation <= 45f || rotation >= 315f) || (rotation >= 135f && rotation <= 225f)){
             distanceX = (rotation > 90f && rotation < 270f) ? -x : Vars.world.width() * Vars.tilesize - x;
@@ -83,10 +87,12 @@ public class PowerBeam{
         if((rotation >= 225f && rotation <= 315f) || (rotation >= 45f && rotation <= 135f)){
             distanceY = (rotation < 180f) ? -y : Vars.world.height() * Vars.tilesize;
         }
+        // for later recalculation, otherwise would be in corner
         if(rotation + 45f % 90f == 0 && distanceX > distanceY){
             distanceX = 0f;
         }
 
+        // 90 degree angles
         if(rotation % 90 != 0){
             final double tan = Math.tan(Math.toRadians(rotation));
             if(distanceX == 0f){
@@ -96,16 +102,17 @@ public class PowerBeam{
             }
         }
 
+        // collect and check every tile between origin and end position
         AtomicReference<Tile> last = new AtomicReference<>();
         enroute.clear();
         Tile origin = Vars.world.tileWorld(x, y);
         Vars.world.raycastEachWorld(x, y, x + distanceX, y + distanceY, (rx, ry) -> {
             Tile rt = Vars.world.tile(rx, ry);
-            if(rt == null || rt == origin) return true;
+            if(rt == null) return true;
+            if(rt == origin) return false;
+            // add all of multiblocks
             if(rt.block().hasBuilding()){
-                rt.build.tile().getLinkedTiles(t -> {
-                    enroute.add(t);
-                });
+                rt.build.tile().getLinkedTiles(t -> enroute.add(t));
             }else{
                 enroute.add(rt);
             }
@@ -113,6 +120,7 @@ public class PowerBeam{
             return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
         });
 
+        // both lengths to last tile
         endX = last.get().worldx();
         endY = last.get().worldy();
         if(endX == x){
@@ -122,9 +130,9 @@ public class PowerBeam{
         }
         length = Math.abs(length);
 
+        // create or update child beams
         Tile t = last.get();
         if(canReflectMirror(t)){
-            System.out.println(((float) t.build.config()) * 2f - rotation + 180f);
             if(childBeam == null){
                 childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, false);
             }else{
@@ -141,6 +149,10 @@ public class PowerBeam{
                 (tile.block() instanceof MirrorBlock && Util.distance(rotation - 180f, (Float) tile.build.config()) < 90f);
     }
 
+    public void invalidate(){
+        this.length = 0f;
+    }
+
     public void update(){
         if(length <= 0f){
             recalculate();
@@ -155,17 +167,21 @@ public class PowerBeam{
             return;
         }
 
-        // todo damage
+        Building originBuilding = Vars.world.tileWorld(x, y).block().hasBuilding() ? Vars.world.tileWorld(x, y).build : null;
+        enroute.forEach(tile -> {
+            if(tile.block().hasBuilding() && tile.build != originBuilding && !(tile.block() instanceof MirrorBlock && canReflectMirror(tile))){
+                //todo balance
+                tile.build.damageContinuous(power);
+            }
+        });
     }
 
     public void draw(){
-        if(length < 0f || !on()) return;
+        //if(length <= 0f || !on()) return;
         //todo make shader work
         Draw.draw(Layer.end, () ->
-                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
+                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, .2f)
         );
-
-
     }
 
     public boolean on(){

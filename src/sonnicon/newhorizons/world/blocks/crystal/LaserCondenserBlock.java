@@ -26,7 +26,7 @@ public class LaserCondenserBlock extends Block{
         hasLiquids = true;
         //todo balance
         liquidCapacity = 20f;
-        consumes.add(new ConsumeLiquidFilter(l -> l.temperature <= 0.5f, 0.04f)).update(false);
+        consumes.add(new ConsumeLiquidFilter(l -> l.temperature <= 0.5f, 0.01f)).update(false);
     }
 
     @Override
