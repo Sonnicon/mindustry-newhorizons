@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
 import mindustry.Vars;
+import mindustry.entities.Fires;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
@@ -15,6 +16,7 @@ import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PowerBeam{
@@ -37,7 +39,11 @@ public class PowerBeam{
                 beams.get(0).remove();
             }
         });
-        Events.run(EventType.Trigger.update, () -> beamsParents.forEach(PowerBeam::update));
+        Events.run(EventType.Trigger.update, () -> {
+            for(int i = beamsParents.size() - 1; i >= 0; i--){
+                beamsParents.get(i).update();
+            }
+        });
         Events.run(EventType.Trigger.draw, () -> beams.forEach(PowerBeam::draw));
     }
 
@@ -177,10 +183,10 @@ public class PowerBeam{
     }
 
     public void draw(){
-        //if(length <= 0f || !on()) return;
+        if(length <= 0f || !on()) return;
         //todo make shader work
-        Draw.draw(Layer.end, () ->
-                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, .2f)
+        Draw.draw(Layer.effect, () ->
+                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
         );
     }
 
