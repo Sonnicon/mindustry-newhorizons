@@ -4,19 +4,18 @@ import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
 import mindustry.Vars;
-import mindustry.entities.Fires;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.core.Util;
+import sonnicon.newhorizons.types.ICatchPowerBeam;
 import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
 import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PowerBeam{
@@ -30,6 +29,7 @@ public class PowerBeam{
     // caching
     protected float length, endX, endY;
     protected HashSet<Tile> enroute = new HashSet<>();
+    protected ICatchPowerBeam catchPowerBeam;
 
     public static void init(){
         Events.on(EventType.TileChangeEvent.class, tile -> recalculateAll(tile.tile));
@@ -111,6 +111,7 @@ public class PowerBeam{
         // collect and check every tile between origin and end position
         AtomicReference<Tile> last = new AtomicReference<>();
         enroute.clear();
+        removeCatched();
         Tile origin = Vars.world.tileWorld(x, y);
         Vars.world.raycastEachWorld(x, y, x + distanceX, y + distanceY, (rx, ry) -> {
             Tile rt = Vars.world.tile(rx, ry);
@@ -125,10 +126,15 @@ public class PowerBeam{
             last.set(rt);
             return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
         });
+        Tile lastTile = last.get();
+        if(lastTile.build instanceof ICatchPowerBeam){
+            ((ICatchPowerBeam) lastTile.build).addPowerBeam(this);
+            catchPowerBeam = (ICatchPowerBeam) lastTile.build;
+        }
 
         // both lengths to last tile
-        endX = last.get().worldx();
-        endY = last.get().worldy();
+        endX = lastTile.worldx();
+        endY = lastTile.worldy();
         if(endX == x){
             length = (endY - y) / (float) Math.sin(Math.toRadians(rotation));
         }else{
@@ -175,7 +181,7 @@ public class PowerBeam{
 
         Building originBuilding = Vars.world.tileWorld(x, y).block().hasBuilding() ? Vars.world.tileWorld(x, y).build : null;
         enroute.forEach(tile -> {
-            if(tile.block().hasBuilding() && tile.build != originBuilding && !(tile.block() instanceof MirrorBlock && canReflectMirror(tile))){
+            if(tile.block().hasBuilding() && tile.build != originBuilding && tile.build != catchPowerBeam && !(tile.block() instanceof MirrorBlock && canReflectMirror(tile))){
                 //todo balance
                 tile.build.damageContinuous(power);
             }
@@ -198,9 +204,17 @@ public class PowerBeam{
         if(childBeam != null){
             childBeam.remove();
         }
+        removeCatched();
         beams.remove(this);
         if(parent){
             beamsParents.remove(this);
+        }
+    }
+
+    protected void removeCatched(){
+        if(catchPowerBeam != null){
+            catchPowerBeam.removePowerBeam(this);
+            catchPowerBeam = null;
         }
     }
 }
