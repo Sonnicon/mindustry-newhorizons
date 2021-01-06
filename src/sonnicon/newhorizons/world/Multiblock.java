@@ -44,12 +44,12 @@ public class Multiblock{
         if(verify && !verify(origin)) return false;
 
         temp.clear();
-        Tile t;
         for(RelativeBlock b : blocks){
-            t = b.fetch(origin);
+            Tile t = b.fetch(origin);
             t.setBlock(Blocks.air);
             temp.add(t);
         }
+
         if(origin.block() != resultBlock){
             origin.setBlock(resultBlock, origin.team(), origin.build.rotation());
         }
@@ -57,16 +57,14 @@ public class Multiblock{
         temp.forEach(tile -> {
             setTileBlock(tile, resultBlock);
             tile.build = origin.build;
-
         });
 
         return true;
     }
 
     public void remove(Tile origin){
-        Tile t;
         for(RelativeBlock b : blocks){
-            t = b.fetch(origin);
+            Tile t = b.fetch(origin);
             setTileBlock(t, Blocks.air);
             t.build = null;
             world.notifyChanged(t);

@@ -25,6 +25,7 @@ import java.util.Random;
 
 public class LaserCondenserBlock extends Block{
     public float maxLensHealth = 200f;
+    protected final float bound3 = maxLensHealth * 0.3f, bound2 = maxLensHealth * 0.6f;
 
     public LaserCondenserBlock(String name){
         super(name);
@@ -65,26 +66,19 @@ public class LaserCondenserBlock extends Block{
         protected float energy = 0f, lensHealth = maxLensHealth;
         protected LinkedList<Pair<Float, Float>> energies;
         protected PowerBeam[] beams = new PowerBeam[3];
+        protected int beamCount = 1;
+
         protected ArrayList<PowerBeam> catchedPowerBeams = new ArrayList<>();
 
         @Override
         public void updateTile(){
             energies.addLast(energies.pop().set(Time.delta, energy * Time.delta));
             float avg = ((float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum()));
-            int count = beamCount();
-            float power = avg + (float) catchedPowerBeams.stream().mapToDouble(beam -> beam.power).sum() / count;
-            for(int i = 0; i < count; i++){
-                beams[i].setPower(power);
-            }
-            for(int i = count; i < beams.length; i++){
-                beams[i].setPower(0f);
+            float power = avg + (float) catchedPowerBeams.stream().mapToDouble(beam -> beam.power).sum() / beamCount;
+            for(int i = 0; i < beams.length; i++){
+                beams[i].setPower(beamCount > i ? power : 0f);
             }
             energy = 0;
-        }
-
-        @Override
-        public void draw(){
-            super.draw();
         }
 
         @Override
@@ -97,7 +91,7 @@ public class LaserCondenserBlock extends Block{
                     // here instead of updateTile() to punish bullet spam, hence decreasing amount of bullets
                     if(consValid()){
                         consume();
-                        bulletEnergy -= bulletEnergy * liquidCapacity / (liquids().total() * 2);
+                        bulletEnergy -= bulletEnergy * liquidCapacity / (liquids().total() * 2f);
                     }else{
                         super.collision(other);
                     }
@@ -165,15 +159,17 @@ public class LaserCondenserBlock extends Block{
 
         @Override
         public void heal(float amount){
+            // Split healing proportionally with damage
             float d1 = maxHealth - health,
                     d2 = maxLensHealth - lensHealth,
                     mul = amount / (d1 + d2);
-            super.heal((float) Math.ceil(d1 * mul));
-            healLens((float) Math.ceil(d2 * mul));
+            super.heal(Util.ceil(d1 * mul));
+            healLens(Util.ceil(d2 * mul));
         }
 
         public void healLens(float amount){
             lensHealth = Math.min(lensHealth + amount, maxLensHealth);
+            updateBeamCount();
         }
 
         public void damageLens(float amount){
@@ -181,12 +177,23 @@ public class LaserCondenserBlock extends Block{
             if(lensHealth <= 0f){
                 kill();
             }
+            updateBeamCount();
         }
 
-        protected int beamCount(){
-            if(lensHealth < maxLensHealth * 0.3f) return 3;
-            if(lensHealth < maxLensHealth * 0.6f) return 2;
-            return 1;
+        @Override
+        public boolean damaged(){
+            return super.damaged() || lensHealth < maxLensHealth;
+        }
+
+        protected int updateBeamCount(){
+            if(lensHealth < bound3){
+                beamCount = 3;
+            }else if(lensHealth < bound2){
+                beamCount = 2;
+            }else{
+                beamCount = 1;
+            }
+            return beamCount;
         }
 
         @Override
@@ -200,6 +207,7 @@ public class LaserCondenserBlock extends Block{
             }
 
             energiesPool.add(energies);
+            energies = null;
         }
 
         @Override

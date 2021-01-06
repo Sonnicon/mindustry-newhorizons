@@ -27,4 +27,13 @@ public class Util{
         }
         throw new IllegalStateException("If you're seeing this, the code is in what I thought was an unreachable state.\nI could give you advice for what to do. But honestly, why should you trust me? I clearly screwed this up.\nI'm writing a message that should never appear, yet I know it will probably appear someday.\nOn a deep level, I know I'm not up to this task. I'm so sorry.");
     }
+
+    // better this than eternally casting
+    public static float ceil(float value){
+        if(value > (int) value){
+            return (int) value + 1;
+        }else{
+            return value;
+        }
+    }
 }
