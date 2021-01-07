@@ -1,5 +1,7 @@
 package sonnicon.newhorizons.world.blocks.crystal;
 
+import arc.Core;
+import arc.func.Boolf;
 import arc.graphics.Color;
 import arc.util.Time;
 import arc.util.io.Reads;
@@ -7,11 +9,15 @@ import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.gen.Bullet;
 import mindustry.graphics.Pal;
+import mindustry.type.Liquid;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.consumers.ConsumeLiquidFilter;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.values.ItemListValue;
+import mindustry.world.meta.values.LiquidFilterValue;
+import sonnicon.newhorizons.content.Blocks;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.entities.PowerBeam;
@@ -26,6 +32,7 @@ import java.util.Random;
 public class LaserCondenserBlock extends Block{
     public float maxLensHealth = 200f;
     protected final float bound3 = maxLensHealth * 0.3f, bound2 = maxLensHealth * 0.6f;
+    protected static final Boolf<Liquid> coolantFilter = liquid -> liquid.temperature <= 0.5f;
 
     public LaserCondenserBlock(String name){
         super(name);
@@ -39,7 +46,7 @@ public class LaserCondenserBlock extends Block{
         absorbLasers = true;
         //todo balance
         liquidCapacity = 20f;
-        consumes.add(new ConsumeLiquidFilter(l -> l.temperature <= 0.5f, 0.01f)).update(false);
+        consumes.add(new ConsumeLiquidFilter(coolantFilter, 0f)).update(false);
     }
 
     @Override
@@ -50,8 +57,17 @@ public class LaserCondenserBlock extends Block{
 
     @Override
     public void setStats(){
-        super.setStats();
+        stats.add(Stat.size, Core.bundle.format("stat.value.irregular"));
+        stats.add(Stat.health, health, StatUnit.none);
         stats.add(Stat.health, maxLensHealth, StatUnit.none);
+
+        if(canBeBuilt()){
+            String s = Core.bundle.format("stat.value.see-block", Blocks.multiblockAssemblyBlock.localizedName);
+            stats.add(Stat.buildTime, s);
+            stats.add(Stat.buildCost, s);
+        }
+        stats.add(Stat.input, new LiquidFilterValue(coolantFilter, Float.NaN, false));
+        stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
     }
 
     // collision distance from center
@@ -88,10 +104,10 @@ public class LaserCondenserBlock extends Block{
                 if(Types.lasers.contains(other.type())){
                     //todo balancing
                     float bulletEnergy = (other.lifetime() - other.time()) * other.type().damage * 0.005f;
-                    // here instead of updateTile() to punish bullet spam, hence decreasing amount of bullets
-                    if(consValid()){
-                        consume();
+                    float liquidRequired = bulletEnergy * liquids.current().temperature;
+                    if(liquids.currentAmount() > liquidRequired){
                         bulletEnergy -= bulletEnergy * liquidCapacity / (liquids().total() * 2f);
+                        liquids.remove(liquids.current(), liquidRequired);
                     }else{
                         super.collision(other);
                     }

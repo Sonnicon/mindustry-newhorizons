@@ -3,6 +3,7 @@ package sonnicon.newhorizons.content;
 import mindustry.content.Items;
 import mindustry.type.Category;
 import mindustry.world.Block;
+import mindustry.world.meta.BuildVisibility;
 import sonnicon.newhorizons.types.ILoadContent;
 import sonnicon.newhorizons.world.blocks.crystal.CrystalBlock;
 import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
@@ -46,7 +47,7 @@ public class Blocks implements ILoadContent{
         }};
 
         laserCondenser = new LaserCondenserBlock("lasercondenser"){{
-
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
         }};
     }
 }
