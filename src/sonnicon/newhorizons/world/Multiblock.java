@@ -43,9 +43,17 @@ public class Multiblock{
     public boolean place(Tile origin, boolean verify){
         if(verify && !verify(origin)) return false;
 
+        float health = 0f;
+        if(verify){
+            health += origin.build.health() / origin.build.maxHealth();
+        }
+
         temp.clear();
         for(RelativeBlock b : blocks){
             Tile t = b.fetch(origin);
+            if(verify){
+                health += t.build.health() / t.build.maxHealth();
+            }
             t.setBlock(Blocks.air);
             temp.add(t);
         }
@@ -58,6 +66,10 @@ public class Multiblock{
             setTileBlock(tile, resultBlock);
             tile.build = origin.build;
         });
+
+        if(verify){
+            origin.build.health(origin.build.health() * health / (temp.size() + 1));
+        }
 
         return true;
     }

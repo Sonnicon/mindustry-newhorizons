@@ -31,6 +31,7 @@ public class MirrorBlock extends Block{
         configurable = true;
         destructible = true;
         solid = true;
+        size = 2;
 
         config(Float.class, (MirrorBlockBuilding building, Float value) -> building.setting = value);
     }

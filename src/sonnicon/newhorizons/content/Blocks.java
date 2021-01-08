@@ -5,10 +5,10 @@ import mindustry.type.Category;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 import sonnicon.newhorizons.types.ILoadContent;
+import sonnicon.newhorizons.world.blocks.MultiblockAssemblyBlock;
 import sonnicon.newhorizons.world.blocks.crystal.CrystalBlock;
 import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
 import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
-import sonnicon.newhorizons.world.blocks.MultiblockAssemblyBlock;
 import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
 import sonnicon.newhorizons.world.blocks.defence.GlassWallBlock;
 
@@ -19,35 +19,24 @@ public class Blocks implements ILoadContent{
 
     @Override
     public void loadContent(){
-        crystalWhite = new CrystalBlock("crystal-white"){{
-            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
-        }};
+        crystalWhite = new CrystalBlock("crystal-white");
+        mirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-        mirror = new MirrorBlock("mirror"){{
-            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+        mirror = new MirrorBlock("mirror");
+        mirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-            size = 2;
-        }};
+        semimirror = new SemiMirrorBlock("semimirror");
+        semimirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-        semimirror = new SemiMirrorBlock("semimirror"){{
-            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+        multiblockAssemblyBlock = new MultiblockAssemblyBlock("multiblock-assembler");
+        multiblockAssemblyBlock.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-            size = 2;
-        }};
+        glassWall = new GlassWallBlock("metaglass-wall");
+        glassWall.requirements(Category.defense, with(Items.metaglass, 6));
+        glassWall.health = 100;
 
-        multiblockAssemblyBlock = new MultiblockAssemblyBlock("multiblock-assembler"){{
-            requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
-        }};
-
-        glassWall = new GlassWallBlock("metaglass-wall"){{
-            requirements(Category.defense, with(Items.metaglass, 6));
-            hasShadow = false;
-            fillsTile = false;
-            health = 100;
-        }};
-
-        laserCondenser = new LaserCondenserBlock("lasercondenser"){{
-            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
-        }};
+        laserCondenser = new LaserCondenserBlock("lasercondenser");
+        laserCondenser.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+        laserCondenser.health = 400;
     }
 }

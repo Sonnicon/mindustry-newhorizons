@@ -8,7 +8,8 @@ import sonnicon.newhorizons.content.Types;
 public class GlassWallBlock extends Wall{
     public GlassWallBlock(String name){
         super(name);
-
+        hasShadow = false;
+        fillsTile = false;
     }
 
     public class GlassWallBlockBuilding extends Building{

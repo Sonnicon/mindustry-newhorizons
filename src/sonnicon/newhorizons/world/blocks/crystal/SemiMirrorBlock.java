@@ -18,8 +18,10 @@ public class SemiMirrorBlock extends MirrorBlock{
                 float time = other.lifetime - (other.lifetime() - other.time()) / 2;
                 int angle = (180 - (int) other.rotation()) % 360;
 
-                Bullet b = type.create(this, null, other.x(), other.y(), angle - 2 * setting);
-                b.time(time);
+                if(angle % 180 != setting){
+                    Bullet b = type.create(this, null, other.x(), other.y(), angle - 2 * setting);
+                    b.time(time);
+                }
 
                 if(type.collidesTeam){
                     other = type.create(this, null, other.x(), other.y(), other.rotation());
@@ -28,8 +30,8 @@ public class SemiMirrorBlock extends MirrorBlock{
                 }else{
                     // Don't create new bullets if not required
                     other.time(time);
-                    other.owner(b.owner());
-                    other.team(b.team());
+                    other.owner(this);
+                    other.team(null);
                     return false;
                 }
             }
