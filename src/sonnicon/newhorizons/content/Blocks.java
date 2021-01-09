@@ -20,7 +20,7 @@ public class Blocks implements ILoadContent{
     @Override
     public void loadContent(){
         crystalWhite = new CrystalBlock("crystal-white");
-        mirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+        crystalWhite.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
         mirror = new MirrorBlock("mirror");
         mirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));

@@ -1,11 +1,19 @@
 package sonnicon.newhorizons.world.blocks;
 
+import arc.Events;
 import arc.graphics.g2d.Draw;
+import arc.util.Align;
+import mindustry.game.EventType;
 import mindustry.gen.Building;
+import mindustry.type.ItemStack;
+import mindustry.ui.ItemDisplay;
+import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import sonnicon.newhorizons.world.Multiblock;
 import sonnicon.newhorizons.world.RelativeBlock;
+
+import static mindustry.Vars.ui;
 
 public class MultiblockAssemblyBlock extends Block{
 
@@ -40,14 +48,28 @@ public class MultiblockAssemblyBlock extends Block{
                 BaseDialog dialog = new BaseDialog("Multiblocks");
                 dialog.addCloseButton();
                 dialog.cont.pane(pane -> Multiblock.multiblocks.forEach((key, value) -> {
-                    pane.button(key.localizedName, () -> {
-                        if(tile.build == this){
-                            configure(value);
-                        }
-                        dialog.hide();
-                    }).width(300f);
+                    pane.table(Styles.black3, t -> {
+                        t.button(key.localizedName, () -> {
+                            if(tile.build == this){
+                                configure(value);
+                            }
+                            dialog.hide();
+                        }).width(300f);
+                        t.button("?", Styles.defaultt, () -> {
+                            ui.content.show(value.resultBlock);
+                            Events.fire(new EventType.BlockInfoEvent());
+                        }).padLeft(2f).name("blockinfo");
+                        t.row();
+                        t.table(costs -> {
+                            for(ItemStack stack : value.costs){
+                                costs.add(new ItemDisplay(stack.item, stack.amount, false)).pad(5f).size(40f);
+                                //t.add().size(100f);
+                                System.out.println("adding stack");
+                            }
+                        });
+                    }).fillX();
                     pane.row();
-                })).width(320f).height(400f);
+                })).fill().height(400f);
                 dialog.show();
             }else{
                 if(selected.verify(tile())){

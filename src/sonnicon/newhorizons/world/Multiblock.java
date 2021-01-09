@@ -2,6 +2,8 @@ package sonnicon.newhorizons.world;
 
 import arc.util.Log;
 import mindustry.content.Blocks;
+import mindustry.type.Item;
+import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 
@@ -14,6 +16,7 @@ public class Multiblock{
     public final Block resultBlock;
     public final List<RelativeBlock> blocks;
     public float drawOffsetX, drawOffsetY;
+    public final ItemStack[] costs;
 
     public static final HashMap<Block, Multiblock> multiblocks = new HashMap<>();
 
@@ -27,6 +30,19 @@ public class Multiblock{
     public Multiblock(Block resultBlock, List<RelativeBlock> blocks){
         this.resultBlock = resultBlock;
         this.blocks = blocks;
+
+        HashMap<Item, ItemStack> c = new HashMap<>();
+        blocks.stream().map(block -> block.block.requirements).forEach((ItemStack[] itemStacks) -> {
+            for(ItemStack stack : itemStacks){
+                if(c.containsKey(stack.item)){
+                    c.get(stack.item).amount += stack.amount;
+                }else{
+                    c.put(stack.item, stack);
+                }
+            }
+        });
+        costs = c.values().toArray(new ItemStack[]{});
+
 
         // (max + min) / 2
         drawOffsetX = (blocks.stream().max(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x +
