@@ -63,8 +63,6 @@ public class MultiblockAssemblyBlock extends Block{
                         t.table(costs -> {
                             for(ItemStack stack : value.costs){
                                 costs.add(new ItemDisplay(stack.item, stack.amount, false)).pad(5f).size(40f);
-                                //t.add().size(100f);
-                                System.out.println("adding stack");
                             }
                         });
                     }).fillX();

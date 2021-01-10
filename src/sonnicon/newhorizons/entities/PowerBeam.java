@@ -21,10 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PowerBeam{
     public float x, y, rotation, power = 0f;
 
-    protected PowerBeam childBeam;
-    protected boolean parent = true;
+    protected PowerBeam childBeam, parentBeam;
 
-    protected static ArrayList<PowerBeam> beamsParents = new ArrayList<>();
     protected static ArrayList<PowerBeam> beams = new ArrayList<>();
     // caching
     protected float length, endX, endY;
@@ -40,26 +38,28 @@ public class PowerBeam{
             }
         });
         Events.run(EventType.Trigger.update, () -> {
-            for(int i = beamsParents.size() - 1; i >= 0; i--){
-                beamsParents.get(i).update();
+            for(int i = beams.size() - 1; i >= 0; i--){
+                beams.get(i).update();
             }
         });
         Events.run(EventType.Trigger.draw, () -> beams.forEach(PowerBeam::draw));
     }
 
-    public PowerBeam(float x, float y, float rotation, boolean parent){
-        set(x, y, rotation, parent);
-        beams.add(this);
-        if(parent){
-            beamsParents.add(this);
+    public PowerBeam(float x, float y, float rotation){
+        this(x, y, rotation, null);
+    }
+    public PowerBeam(float x, float y, float rotation, PowerBeam parentBeam){
+        set(x, y, rotation, parentBeam);
+        if(parentBeam == null){
+            beams.add(this);
         }
     }
 
-    public void set(float x, float y, float rotation, boolean parent){
+    public void set(float x, float y, float rotation, PowerBeam parentBeam){
         this.x = x;
         this.y = y;
         this.rotation = rotation % 360f;
-        this.parent = parent;
+        this.parentBeam = parentBeam;
         length = 0;
     }
 
@@ -75,11 +75,15 @@ public class PowerBeam{
     }
 
     public static void recalculateAll(Tile tile){
-        beams.forEach(beam -> {
-            if(tile == null || (beam.enroute.contains(tile))){
-                beam.invalidate();
-            }
-        });
+        beams.forEach(beam -> beam.recalculate(tile));
+    }
+
+    public void recalculate(Tile tile){
+        if(tile == null || enroute.contains(tile)){
+            recalculate();
+        }else if(childBeam != null){
+            childBeam.recalculate(tile);
+        }
     }
 
     public void recalculate(){
@@ -146,9 +150,9 @@ public class PowerBeam{
         Tile t = last.get();
         if(canReflectMirror(t)){
             if(childBeam == null){
-                childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, false);
+                childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
             }else{
-                childBeam.set(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, false);
+                childBeam.set(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
             }
         }else if(childBeam != null){
             childBeam.remove();
@@ -189,15 +193,22 @@ public class PowerBeam{
     }
 
     public void draw(){
-        if(length <= 0f || !on()) return;
+        if(isParent() && (length <= 0f || !isOn())) return;
         //todo make shader work
         Draw.draw(Layer.effect, () ->
                 Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
         );
+        if(childBeam != null){
+            childBeam.draw();
+        }
     }
 
-    public boolean on(){
+    public boolean isOn(){
         return power > 0f;
+    }
+
+    public boolean isParent(){
+        return parentBeam == null;
     }
 
     public void remove(){
@@ -205,9 +216,8 @@ public class PowerBeam{
             childBeam.remove();
         }
         removeCatched();
-        beams.remove(this);
-        if(parent){
-            beamsParents.remove(this);
+        if(isParent()){
+            beams.remove(this);
         }
     }
 

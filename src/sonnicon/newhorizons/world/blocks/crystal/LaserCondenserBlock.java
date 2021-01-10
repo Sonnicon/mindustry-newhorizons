@@ -164,7 +164,7 @@ public class LaserCondenserBlock extends Block{
         }
 
         PowerBeam createBeam(float rot){
-            return new PowerBeam(temp.getX(), temp.getY(), rot, true);
+            return new PowerBeam(temp.getX(), temp.getY(), rot);
         }
 
         @Override
