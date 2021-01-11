@@ -26,6 +26,7 @@ import sonnicon.newhorizons.types.Pair;
 import sonnicon.newhorizons.world.MultiblockBuilding;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -81,7 +82,7 @@ public class LaserCondenserBlock extends Block{
     public class LaserCondenserBlockBuilding extends MultiblockBuilding implements ICatchPowerBeam{
         protected float energy = 0f, lensHealth = maxLensHealth;
         protected LinkedList<Pair<Float, Float>> energies;
-        protected PowerBeam[] beams = new PowerBeam[3];
+        public PowerBeam[] beams = new PowerBeam[3];
         protected int beamCount = 1;
 
         protected ArrayList<PowerBeam> catchedPowerBeams = new ArrayList<>();
@@ -253,6 +254,11 @@ public class LaserCondenserBlock extends Block{
         @Override
         public boolean removePowerBeam(PowerBeam beam){
             return catchedPowerBeams.remove(beam);
+        }
+
+        @Override
+        public ArrayList<PowerBeam> getPowerBeams(){
+            return catchedPowerBeams;
         }
     }
 }

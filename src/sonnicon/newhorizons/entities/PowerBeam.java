@@ -11,12 +11,16 @@ import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.types.ICatchPowerBeam;
+import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
 import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
 import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class PowerBeam{
     public float x, y, rotation, power = 0f;
@@ -131,7 +135,7 @@ public class PowerBeam{
             return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
         });
         Tile lastTile = last.get();
-        if(lastTile.build instanceof ICatchPowerBeam){
+        if(shouldCatch(lastTile)){
             ((ICatchPowerBeam) lastTile.build).addPowerBeam(this);
             catchPowerBeam = (ICatchPowerBeam) lastTile.build;
         }
@@ -163,6 +167,23 @@ public class PowerBeam{
     protected boolean canReflectMirror(Tile tile){
         return tile.block() instanceof SemiMirrorBlock ||
                 (tile.block() instanceof MirrorBlock && Util.distance(rotation - 180f, (Float) tile.build.config()) < 90f);
+    }
+
+    protected boolean shouldCatch(Tile lastTile){
+        if(lastTile.build instanceof ICatchPowerBeam){
+            if(lastTile.block() instanceof LaserCondenserBlock){
+                Set<PowerBeam> beams = Arrays.stream(((LaserCondenserBlock.LaserCondenserBlockBuilding) lastTile.build).beams).collect(Collectors.toSet());
+                PowerBeam pb = this;
+                while(pb != null){
+                    if(beams.contains(pb)){
+                        return false;
+                    }
+                    pb = pb.parentBeam;
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void invalidate(){
