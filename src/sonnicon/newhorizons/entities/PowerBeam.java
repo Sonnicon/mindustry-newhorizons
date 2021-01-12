@@ -23,35 +23,46 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class PowerBeam{
-    public float x, y, rotation, power = 0f;
-
+    // Position of start of beam
+    protected float x, y, rotation;
+    // Damage and width of beam
+    protected float power = 0f;
+    // Beams before and after redirection
     protected PowerBeam childBeam, parentBeam;
 
+    // All loaded beams without parents
     protected static ArrayList<PowerBeam> beams = new ArrayList<>();
-    // caching
+    // End tile
     protected float length, endX, endY;
+    // Tiles on beam path (reduce recalculations)
     protected HashSet<Tile> enroute = new HashSet<>();
+    // Object currently catching the beam
     protected ICatchPowerBeam catchPowerBeam;
 
+    // Register events
     public static void init(){
         Events.on(EventType.TileChangeEvent.class, tile -> recalculateAll(tile.tile));
-        // they would stick around after loading another save
+
         Events.on(EventType.ResetEvent.class, event -> {
             while(!beams.isEmpty()){
                 beams.get(0).remove();
             }
         });
+
         Events.run(EventType.Trigger.update, () -> {
+            // Update from end because removals can happen
             for(int i = beams.size() - 1; i >= 0; i--){
                 beams.get(i).update();
             }
         });
+
         Events.run(EventType.Trigger.draw, () -> beams.forEach(PowerBeam::draw));
     }
 
     public PowerBeam(float x, float y, float rotation){
         this(x, y, rotation, null);
     }
+
     public PowerBeam(float x, float y, float rotation, PowerBeam parentBeam){
         set(x, y, rotation, parentBeam);
         if(parentBeam == null){
@@ -59,19 +70,25 @@ public class PowerBeam{
         }
     }
 
+    // Move beam and recalculate
     public void set(float x, float y, float rotation, PowerBeam parentBeam){
         this.x = x;
         this.y = y;
         this.rotation = rotation % 360f;
         this.parentBeam = parentBeam;
-        length = 0;
+        invalidate();
     }
 
+    // Set power of beam and child beam
     public void setPower(float power){
         this.power = power;
-        if(childBeam != null){
+        if(hasChild()){
             childBeam.setPower(power);
         }
+    }
+
+    public float getPower(){
+        return power;
     }
 
     public static void recalculateAll(){
@@ -85,15 +102,15 @@ public class PowerBeam{
     public void recalculate(Tile tile){
         if(tile == null || enroute.contains(tile)){
             recalculate();
-        }else if(childBeam != null){
+        }else if(hasChild()){
             childBeam.recalculate(tile);
         }
     }
 
     public void recalculate(){
-        // this was a nightmare because I didn't know the trigonometric functions took radians
+        // This was a nightmare because I didn't know the trigonometric functions took radians
 
-        // distance to axis
+        // Distance to edge of map
         float distanceX = 0f, distanceY = 0f;
         if((rotation <= 45f || rotation >= 315f) || (rotation >= 135f && rotation <= 225f)){
             distanceX = (rotation > 90f && rotation < 270f) ? -x : Vars.world.width() * Vars.tilesize - x;
@@ -101,7 +118,7 @@ public class PowerBeam{
         if((rotation >= 225f && rotation <= 315f) || (rotation >= 45f && rotation <= 135f)){
             distanceY = (rotation < 180f) ? -y : Vars.world.height() * Vars.tilesize;
         }
-        // for later recalculation, otherwise would be in corner
+        // For later recalculation, otherwise would be in corner
         if(rotation + 45f % 90f == 0 && distanceX > distanceY){
             distanceX = 0f;
         }
@@ -116,7 +133,7 @@ public class PowerBeam{
             }
         }
 
-        // collect and check every tile between origin and end position
+        // Collect and check every tile between origin and end position
         AtomicReference<Tile> last = new AtomicReference<>();
         enroute.clear();
         removeCatched();
@@ -125,22 +142,25 @@ public class PowerBeam{
             Tile rt = Vars.world.tile(rx, ry);
             if(rt == null) return true;
             if(rt == origin) return false;
-            // add all of multiblocks
+            // Add all of multiblocks
             if(rt.block().hasBuilding()){
                 rt.build.tile().getLinkedTiles(t -> enroute.add(t));
             }else{
                 enroute.add(rt);
             }
             last.set(rt);
+            // ew
             return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
         });
+
+        // Catch
         Tile lastTile = last.get();
         if(shouldCatch(lastTile)){
             ((ICatchPowerBeam) lastTile.build).addPowerBeam(this);
             catchPowerBeam = (ICatchPowerBeam) lastTile.build;
         }
 
-        // both lengths to last tile
+        // Both lengths to last tile
         endX = lastTile.worldx();
         endY = lastTile.worldy();
         if(endX == x){
@@ -150,25 +170,27 @@ public class PowerBeam{
         }
         length = Math.abs(length);
 
-        // create or update child beams
+        // Deal with child beam
         Tile t = last.get();
         if(canReflectMirror(t)){
-            if(childBeam == null){
+            if(!hasChild()){
                 childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
             }else{
                 childBeam.set(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
             }
-        }else if(childBeam != null){
+        }else if(hasChild()){
             childBeam.remove();
             childBeam = null;
         }
     }
 
+    // Check rotation of mirror
     protected boolean canReflectMirror(Tile tile){
         return tile.block() instanceof SemiMirrorBlock ||
                 (tile.block() instanceof MirrorBlock && Util.distance(rotation - 180f, (Float) tile.build.config()) < 90f);
     }
 
+    // Ensure no infinite beam loop
     protected boolean shouldCatch(Tile lastTile){
         if(lastTile.build instanceof ICatchPowerBeam){
             if(lastTile.block() instanceof LaserCondenserBlock){
@@ -190,12 +212,13 @@ public class PowerBeam{
         this.length = 0f;
     }
 
+    // Update beam and child
     public void update(){
         if(length <= 0f){
             recalculate();
         }
 
-        if(childBeam != null){
+        if(hasChild()){
             childBeam.update();
         }
 
@@ -213,13 +236,14 @@ public class PowerBeam{
         });
     }
 
+    // Draw beam and child
     public void draw(){
-        if(isParent() && (length <= 0f || !isOn())) return;
+        if(!hasParent() && (length <= 0f || !isOn())) return;
         //todo make shader work
         Draw.draw(Layer.effect, () ->
                 Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
         );
-        if(childBeam != null){
+        if(hasChild()){
             childBeam.draw();
         }
     }
@@ -228,16 +252,20 @@ public class PowerBeam{
         return power > 0f;
     }
 
-    public boolean isParent(){
-        return parentBeam == null;
+    public boolean hasParent(){
+        return parentBeam != null;
+    }
+
+    public boolean hasChild(){
+        return childBeam != null;
     }
 
     public void remove(){
-        if(childBeam != null){
+        if(hasChild()){
             childBeam.remove();
         }
         removeCatched();
-        if(isParent()){
+        if(!hasParent()){
             beams.remove(this);
         }
     }

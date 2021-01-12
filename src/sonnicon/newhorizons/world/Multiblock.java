@@ -6,6 +6,7 @@ import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import sonnicon.newhorizons.core.Util;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -13,15 +14,19 @@ import java.util.*;
 import static mindustry.Vars.world;
 
 public class Multiblock{
+    // Block placed when assembled
     public final Block resultBlock;
-    public final List<RelativeBlock> blocks;
-    public float drawOffsetX, drawOffsetY;
+    // Blocks and positions for assembly
+    protected final List<RelativeBlock> blocks;
+    // Offset for drawing as entity tile is not always center
+    protected final float drawOffsetX, drawOffsetY;
+    // Total build cost
     public final ItemStack[] costs;
 
-    public static final HashMap<Block, Multiblock> multiblocks = new HashMap<>();
+    // Every loaded multiblock
+    protected static final HashMap<Block, Multiblock> multiblocks = new HashMap<>();
 
     protected static final ArrayList<Tile> temp = new ArrayList<>();
-    protected static Field blockField;
 
     public Multiblock(Block resultBlock, RelativeBlock... blocks){
         this(resultBlock, Arrays.asList(blocks));
@@ -31,6 +36,7 @@ public class Multiblock{
         this.resultBlock = resultBlock;
         this.blocks = blocks;
 
+        // Total up costs
         HashMap<Item, ItemStack> c = new HashMap<>();
         blocks.stream().map(block -> block.block.requirements).forEach((ItemStack[] itemStacks) -> {
             for(ItemStack stack : itemStacks){
@@ -43,12 +49,12 @@ public class Multiblock{
         });
         costs = c.values().toArray(new ItemStack[]{});
 
-
         // (max + min) / 2
         drawOffsetX = (blocks.stream().max(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x +
                 blocks.stream().min(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x) / 2f;
         drawOffsetY = (blocks.stream().max(Comparator.comparingInt(x -> x.y)).orElseThrow(NoSuchElementException::new).y +
                 blocks.stream().min(Comparator.comparingInt(x -> x.y)).orElseThrow(NoSuchElementException::new).y) / 2f;
+
         multiblocks.put(resultBlock, this);
     }
 
@@ -79,7 +85,7 @@ public class Multiblock{
         }
 
         temp.forEach(tile -> {
-            setTileBlock(tile, resultBlock);
+            Util.setTileBlock(tile, resultBlock);
             tile.build = origin.build;
         });
 
@@ -93,22 +99,9 @@ public class Multiblock{
     public void remove(Tile origin){
         for(RelativeBlock b : blocks){
             Tile t = b.fetch(origin);
-            setTileBlock(t, Blocks.air);
+            Util.setTileBlock(t, Blocks.air);
             t.build = null;
             world.notifyChanged(t);
-        }
-    }
-
-    void setTileBlock(Tile tile, Block block){
-        try{
-            if(blockField == null){
-                blockField = Tile.class.getDeclaredField("block");
-                blockField.setAccessible(true);
-            }
-            blockField.set(tile, block);
-        }catch(NoSuchFieldException | IllegalAccessException ex){
-            Log.err(ex);
-            ex.printStackTrace();
         }
     }
 
@@ -117,5 +110,13 @@ public class Multiblock{
             if(!b.check(origin)) return false;
         }
         return true;
+    }
+
+    public List<RelativeBlock> getBlocks(){
+        return blocks;
+    }
+
+    public static HashMap<Block, Multiblock> getMultiblocks(){
+        return multiblocks;
     }
 }

@@ -1,8 +1,15 @@
 package sonnicon.newhorizons.core;
 
+import arc.util.Log;
+import mindustry.world.Block;
+import mindustry.world.Tile;
 import sonnicon.newhorizons.types.Pair;
 
+import java.lang.reflect.Field;
+
 public class Util{
+
+    protected static Field blockField;
 
     public static float distance(float a, float b){
         float c = Math.abs(b - a) % 360f;
@@ -34,6 +41,19 @@ public class Util{
             return (int) value + 1;
         }else{
             return value;
+        }
+    }
+
+    public static void setTileBlock(Tile tile, Block block){
+        try{
+            if(blockField == null){
+                blockField = Tile.class.getDeclaredField("block");
+                blockField.setAccessible(true);
+            }
+            blockField.set(tile, block);
+        }catch(NoSuchFieldException | IllegalAccessException ex){
+            Log.err(ex);
+            ex.printStackTrace();
         }
     }
 }

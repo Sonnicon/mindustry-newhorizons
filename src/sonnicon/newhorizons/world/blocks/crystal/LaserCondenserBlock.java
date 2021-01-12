@@ -15,7 +15,6 @@ import mindustry.world.Block;
 import mindustry.world.consumers.ConsumeLiquidFilter;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
-import mindustry.world.meta.values.ItemListValue;
 import mindustry.world.meta.values.LiquidFilterValue;
 import sonnicon.newhorizons.content.Blocks;
 import sonnicon.newhorizons.content.Types;
@@ -26,7 +25,6 @@ import sonnicon.newhorizons.types.Pair;
 import sonnicon.newhorizons.world.MultiblockBuilding;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -91,7 +89,7 @@ public class LaserCondenserBlock extends Block{
         public void updateTile(){
             energies.addLast(energies.pop().set(Time.delta, energy * Time.delta));
             float avg = ((float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum()));
-            float power = avg + (float) catchedPowerBeams.stream().mapToDouble(beam -> beam.power).sum() / beamCount;
+            float power = avg + (float) catchedPowerBeams.stream().mapToDouble(PowerBeam::getPower).sum() / beamCount;
             for(int i = 0; i < beams.length; i++){
                 beams[i].setPower(beamCount > i ? power : 0f);
             }

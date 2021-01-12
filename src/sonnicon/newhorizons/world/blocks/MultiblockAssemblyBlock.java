@@ -35,7 +35,7 @@ public class MultiblockAssemblyBlock extends Block{
 
             if(selected != null){
                 Draw.alpha(0.5f);
-                for(RelativeBlock b : selected.blocks){
+                for(RelativeBlock b : selected.getBlocks()){
                     b.draw(tile);
                 }
                 Draw.reset();
@@ -47,7 +47,7 @@ public class MultiblockAssemblyBlock extends Block{
             if(selected == null){
                 BaseDialog dialog = new BaseDialog("Multiblocks");
                 dialog.addCloseButton();
-                dialog.cont.pane(pane -> Multiblock.multiblocks.forEach((key, value) -> {
+                dialog.cont.pane(pane -> Multiblock.getMultiblocks().forEach((key, value) -> {
                     pane.table(Styles.black3, t -> {
                         t.button(key.localizedName, () -> {
                             if(tile.build == this){
