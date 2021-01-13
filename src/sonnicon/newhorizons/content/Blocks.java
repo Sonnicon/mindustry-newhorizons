@@ -6,19 +6,17 @@ import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 import sonnicon.newhorizons.types.ILoadContent;
 import sonnicon.newhorizons.world.blocks.MultiblockAssemblyBlock;
-import sonnicon.newhorizons.world.blocks.crystal.CrystalBlock;
-import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
-import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
-import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
+import sonnicon.newhorizons.world.blocks.crystal.*;
 import sonnicon.newhorizons.world.blocks.defence.GlassWallBlock;
 
 import static mindustry.type.ItemStack.with;
 
 public class Blocks implements ILoadContent{
-    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser;
+    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, beamAbsorber;
 
     @Override
     public void loadContent(){
+        //todo balancing
         crystalWhite = new CrystalBlock("crystal-white");
         crystalWhite.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
@@ -38,5 +36,9 @@ public class Blocks implements ILoadContent{
         laserCondenser = new LaserCondenserBlock("lasercondenser");
         laserCondenser.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
         laserCondenser.health = 400;
+
+        beamAbsorber = new BeamAbsorberBlock("beamabsorber");
+        beamAbsorber.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+        beamAbsorber.health = 400;
     }
 }

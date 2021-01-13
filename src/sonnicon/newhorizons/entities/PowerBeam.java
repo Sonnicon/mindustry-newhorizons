@@ -202,8 +202,8 @@ public class PowerBeam{
                     }
                     pb = pb.parentBeam;
                 }
-                return true;
             }
+            return true;
         }
         return false;
     }

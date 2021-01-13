@@ -1,6 +1,5 @@
 package sonnicon.newhorizons.world;
 
-import arc.util.Log;
 import mindustry.content.Blocks;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -8,7 +7,6 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.core.Util;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 import static mindustry.Vars.world;
