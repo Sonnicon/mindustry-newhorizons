@@ -245,6 +245,11 @@ public class LaserCondenserBlock extends Block{
         }
 
         @Override
+        public boolean shouldCatch(PowerBeam beam){
+            return true;
+        }
+
+        @Override
         public void addPowerBeam(PowerBeam beam){
             catchedPowerBeams.add(beam);
         }

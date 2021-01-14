@@ -91,6 +91,15 @@ public class PowerBeam{
         return power;
     }
 
+    public float getRotation(){
+        return rotation;
+    }
+
+    public void setRotation(float rotation){
+        this.rotation = rotation % 360f;
+        invalidate();
+    }
+
     public static void recalculateAll(){
         recalculateAll(null);
     }
@@ -192,9 +201,11 @@ public class PowerBeam{
 
     // Ensure no infinite beam loop
     protected boolean shouldCatch(Tile lastTile){
-        if(lastTile.build instanceof ICatchPowerBeam){
+        if(lastTile.build instanceof ICatchPowerBeam &&
+                ((ICatchPowerBeam) lastTile.build).shouldCatch(this)){
             if(lastTile.block() instanceof LaserCondenserBlock){
-                Set<PowerBeam> beams = Arrays.stream(((LaserCondenserBlock.LaserCondenserBlockBuilding) lastTile.build).beams).collect(Collectors.toSet());
+                Set<PowerBeam> beams = Arrays.stream(((LaserCondenserBlock.LaserCondenserBlockBuilding) lastTile.build).beams)
+                        .collect(Collectors.toSet());
                 PowerBeam pb = this;
                 while(pb != null){
                     if(beams.contains(pb)){

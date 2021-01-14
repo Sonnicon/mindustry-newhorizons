@@ -28,6 +28,11 @@ public class BeamAbsorberBlock extends PowerGenerator{
         }
 
         @Override
+        public boolean shouldCatch(PowerBeam beam){
+            return true;
+        }
+
+        @Override
         public void addPowerBeam(PowerBeam beam){
             catchedBeams.add(beam);
         }

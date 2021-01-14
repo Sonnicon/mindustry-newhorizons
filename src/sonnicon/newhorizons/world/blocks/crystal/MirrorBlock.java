@@ -72,7 +72,7 @@ public class MirrorBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.field(String.valueOf(config()), (textField, c) -> Character.isDigit(c), input -> configure(Float.parseFloat("0" + input)));
+            table.field(String.valueOf(config()), (textField, c) -> Character.isDigit(c) || c == '.', input -> configure(Float.parseFloat("0" + input)));
         }
 
         @Override
