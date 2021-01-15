@@ -13,7 +13,7 @@ import sonnicon.newhorizons.world.blocks.sandbox.PowerBeamSpawnerBlock;
 import static mindustry.type.ItemStack.with;
 
 public class Blocks implements ILoadContent{
-    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, powerbeamSpawner, beamAbsorber;
+    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, powerbeamSpawner, beamGenerator;
 
     @Override
     public void loadContent(){
@@ -41,8 +41,8 @@ public class Blocks implements ILoadContent{
         powerbeamSpawner = new PowerBeamSpawnerBlock("powerbeamspawner");
         powerbeamSpawner.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
 
-        beamAbsorber = new BeamAbsorberBlock("beamabsorber");
-        beamAbsorber.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
-        beamAbsorber.health = 400;
+        beamGenerator = new BeamGeneratorBlock("beamgenerator");
+        beamGenerator.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+        beamGenerator.health = 400;
     }
 }

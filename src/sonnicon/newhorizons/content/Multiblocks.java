@@ -22,13 +22,14 @@ public class Multiblocks implements ILoadContent{
                 relativeBlock(Blocks.glassWall, -1, 0)
         );
 
-        beamAbsorber = new Multiblock(Blocks.beamAbsorber,
-                relativeBlock(Blocks.glassWall, -1, 2),
-                relativeBlock(liquidJunction, 0, 2),
-                relativeBlock(Blocks.glassWall, -1, 1),
-                relativeBlock(diode, 0, 1),
-                relativeBlock(arc, 1, 1),
-                relativeBlock(Blocks.glassWall, -1, 0)
+        beamAbsorber = new Multiblock(Blocks.beamGenerator,
+                relativeBlock(Blocks.glassWall, -3, 0),
+                relativeBlock(battery, -2, 0),
+                relativeBlock(battery, -1, 0),
+                relativeBlock(surgeWall, -2, 1),
+                relativeBlock(surgeWall, -1, 1),
+                relativeBlock(surgeWall, -2, -1),
+                relativeBlock(surgeWall, -1, -1)
         );
     }
 }

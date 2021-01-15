@@ -45,6 +45,7 @@ public class MultiblockBuilding extends Building{
         }
         x += drawx * Vars.tilesize;
         y += drawy * Vars.tilesize;
+        System.out.println(m.resultBlock.name + ", " + m.drawOffsetX + ", " + m.drawOffsetY);
     }
 
     @Override

@@ -7,8 +7,8 @@ import sonnicon.newhorizons.world.MultiblockBuilding;
 
 import java.util.ArrayList;
 
-public class BeamAbsorberBlock extends PowerGenerator{
-    public BeamAbsorberBlock(String name){
+public class BeamGeneratorBlock extends PowerGenerator{
+    public BeamGeneratorBlock(String name){
         super(name);
 
         absorbLasers = true;
