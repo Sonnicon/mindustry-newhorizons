@@ -61,6 +61,7 @@ public class Multiblock{
         return place(origin, true);
     }
 
+    // Place the multiblock centered on a tile, with optional checking for validity
     public boolean place(Tile origin, boolean verify){
         if(verify && !verify(origin)) return false;
 
@@ -95,6 +96,7 @@ public class Multiblock{
         return true;
     }
 
+    // Clear all artifacts of surrounding tiles
     public void remove(Tile origin){
         for(RelativeBlock b : blocks){
             Tile t = b.fetch(origin);
@@ -104,6 +106,7 @@ public class Multiblock{
         }
     }
 
+    // Verify that multiblock is assembled correctly
     public boolean verify(Tile origin){
         for(RelativeBlock b : blocks){
             if(!b.check(origin)) return false;
@@ -117,5 +120,9 @@ public class Multiblock{
 
     public static HashMap<Block, Multiblock> getMultiblocks(){
         return multiblocks;
+    }
+
+    public static Multiblock getMultiblock(Block block){
+        return multiblocks.get(block);
     }
 }

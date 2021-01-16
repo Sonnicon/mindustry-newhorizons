@@ -79,35 +79,17 @@ public class PowerBeam{
         invalidate();
     }
 
-    // Set power of beam and child beam
-    public void setPower(float power){
-        this.power = power;
-        if(hasChild()){
-            childBeam.setPower(power);
-        }
-    }
-
-    public float getPower(){
-        return power;
-    }
-
-    public float getRotation(){
-        return rotation;
-    }
-
-    public void setRotation(float rotation){
-        this.rotation = rotation % 360f;
-        invalidate();
-    }
-
+    // Recalculate every single PowerBeam
     public static void recalculateAll(){
         recalculateAll(null);
     }
 
+    // Recalculate every PowerBeam that crosses through a tile
     public static void recalculateAll(Tile tile){
         beams.forEach(beam -> beam.recalculate(tile));
     }
 
+    // Try to recalculate this PowerBeam if it crosses through a tile
     public void recalculate(Tile tile){
         if(tile == null || enroute.contains(tile)){
             recalculate();
@@ -116,6 +98,7 @@ public class PowerBeam{
         }
     }
 
+    // Catastrophic raycast recalculation
     public void recalculate(){
         // This was a nightmare because I didn't know the trigonometric functions took radians
 
@@ -164,14 +147,14 @@ public class PowerBeam{
 
         // Catch
         Tile lastTile = last.get();
+        endX = lastTile.worldx();
+        endY = lastTile.worldy();
         if(shouldCatch(lastTile)){
             ((ICatchPowerBeam) lastTile.build).addPowerBeam(this);
             catchPowerBeam = (ICatchPowerBeam) lastTile.build;
         }
 
         // Both lengths to last tile
-        endX = lastTile.worldx();
-        endY = lastTile.worldy();
         if(endX == x){
             length = (endY - y) / (float) Math.sin(Math.toRadians(rotation));
         }else{
@@ -219,10 +202,6 @@ public class PowerBeam{
         return false;
     }
 
-    public void invalidate(){
-        this.length = 0f;
-    }
-
     // Update beam and child
     public void update(){
         if(length <= 0f){
@@ -259,6 +238,32 @@ public class PowerBeam{
         }
     }
 
+    // Force recalculation on next update
+    public void invalidate(){
+        this.length = 0f;
+    }
+
+    // Set power of beam and child beam
+    public void setPower(float power){
+        this.power = power;
+        if(hasChild()){
+            childBeam.setPower(power);
+        }
+    }
+
+    public float getPower(){
+        return power;
+    }
+
+    public void setRotation(float rotation){
+        this.rotation = rotation % 360f;
+        invalidate();
+    }
+
+    public float getRotation(){
+        return rotation;
+    }
+
     public boolean isOn(){
         return power > 0f;
     }
@@ -271,6 +276,15 @@ public class PowerBeam{
         return childBeam != null;
     }
 
+    public float getEndX(){
+        return endX;
+    }
+
+    public float getEndY(){
+        return endY;
+    }
+
+    // Remove beam and all accessors
     public void remove(){
         if(hasChild()){
             childBeam.remove();

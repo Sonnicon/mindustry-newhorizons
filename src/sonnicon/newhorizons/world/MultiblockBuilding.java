@@ -16,6 +16,7 @@ public class MultiblockBuilding extends Building{
         }
     }
 
+    // Doesn't get called at drastically different states based on whether placing or loading a save
     public void unbiasedCreated(){
         Multiblock m = Multiblock.multiblocks.get(block());
         Core.app.post(() -> m.place(tile(), false));
@@ -45,7 +46,6 @@ public class MultiblockBuilding extends Building{
         }
         x += drawx * Vars.tilesize;
         y += drawy * Vars.tilesize;
-        System.out.println(m.resultBlock.name + ", " + m.drawOffsetX + ", " + m.drawOffsetY);
     }
 
     @Override

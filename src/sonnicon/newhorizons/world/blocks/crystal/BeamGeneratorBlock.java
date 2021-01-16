@@ -1,11 +1,15 @@
 package sonnicon.newhorizons.world.blocks.crystal;
 
+import mindustry.world.Tile;
 import mindustry.world.blocks.power.PowerGenerator;
 import sonnicon.newhorizons.entities.PowerBeam;
 import sonnicon.newhorizons.types.ICatchPowerBeam;
+import sonnicon.newhorizons.world.Multiblock;
 import sonnicon.newhorizons.world.MultiblockBuilding;
+import sonnicon.newhorizons.world.RelativeBlock;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class BeamGeneratorBlock extends PowerGenerator{
     public BeamGeneratorBlock(String name){
@@ -20,6 +24,19 @@ public class BeamGeneratorBlock extends PowerGenerator{
 
     public class BeamAbsorberBlockBuilding extends MultiblockBuilding implements ICatchPowerBeam{
         protected ArrayList<PowerBeam> catchedBeams = new ArrayList<>();
+        protected Tile catchyTile;
+
+        @Override
+        public void unbiasedCreated(){
+            super.unbiasedCreated();
+            RelativeBlock catchyRelative = Multiblock.getMultiblock(block()).getBlocks().stream().min(Comparator.comparingInt(rel -> rel.x)).orElse(null);
+            // Shouldn't happen
+            if(catchyRelative == null){
+                kill();
+                return;
+            }
+            catchyTile = catchyRelative.fetch(tile());
+        }
 
         @Override
         public float getPowerProduction(){
@@ -29,7 +46,7 @@ public class BeamGeneratorBlock extends PowerGenerator{
 
         @Override
         public boolean shouldCatch(PowerBeam beam){
-            return true;
+            return Math.abs(catchyTile.worldx() - beam.getEndX()) < 0.001f && Math.abs(catchyTile.worldy() - beam.getEndY()) < 0.001f;
         }
 
         @Override
