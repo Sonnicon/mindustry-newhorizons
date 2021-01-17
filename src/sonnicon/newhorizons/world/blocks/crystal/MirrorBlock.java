@@ -15,6 +15,7 @@ import mindustry.world.Block;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Vars;
 import sonnicon.newhorizons.entities.PowerBeam;
+import sonnicon.newhorizons.types.IDamagePowerBeam;
 
 import static sonnicon.newhorizons.core.Util.distance;
 
@@ -49,7 +50,7 @@ public class MirrorBlock extends Block{
         return new Rect().setCentered(0, 0, mindustry.Vars.tilesize / 4f * size, mindustry.Vars.tilesize * size + 2f);
     }
 
-    public class MirrorBlockBuilding extends Building{
+    public class MirrorBlockBuilding extends Building implements IDamagePowerBeam{
         protected float setting = 0;
 
         @Override
@@ -95,7 +96,7 @@ public class MirrorBlock extends Block{
         public boolean collision(Bullet other){
             float bRotation = (180f - other.rotation()) % 360f;
             BulletType type = other.type();
-            if(Types.lasers.contains(type) && distance(config(), bRotation) < 90f){
+            if(Types.lasers.contains(type) && shouldReflectAngle(bRotation)){
                 float bounceAngle = bRotation - 2f * config();
                 if(type.collidesTeam){
                     Bullet b = type.create(this, null, other.x(), other.y(), bounceAngle);
@@ -112,6 +113,10 @@ public class MirrorBlock extends Block{
             return super.collision(other);
         }
 
+        public boolean shouldReflectAngle(float rotation){
+            return distance(config(), rotation) < 90f;
+        }
+
         @Override
         public void write(Writes write){
             super.write(write);
@@ -124,6 +129,11 @@ public class MirrorBlock extends Block{
             super.read(read, revision);
 
             setting = read.f();
+        }
+
+        @Override
+        public boolean damage(PowerBeam beam){
+            return !shouldReflectAngle(beam.getRotation() - 180f);
         }
     }
 }

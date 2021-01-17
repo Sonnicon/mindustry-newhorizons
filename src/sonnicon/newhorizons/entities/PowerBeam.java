@@ -9,11 +9,10 @@ import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
-import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.types.ICatchPowerBeam;
+import sonnicon.newhorizons.types.IDamagePowerBeam;
 import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
 import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
-import sonnicon.newhorizons.world.blocks.crystal.SemiMirrorBlock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +74,10 @@ public class PowerBeam{
         this.x = x;
         this.y = y;
         this.rotation = rotation % 360f;
-        this.parentBeam = parentBeam;
+        if(parentBeam != null){
+            this.parentBeam = parentBeam;
+            setPower(parentBeam.power);
+        }
         invalidate();
     }
 
@@ -133,7 +135,7 @@ public class PowerBeam{
         Vars.world.raycastEachWorld(x, y, x + distanceX, y + distanceY, (rx, ry) -> {
             Tile rt = Vars.world.tile(rx, ry);
             if(rt == null) return true;
-            if(rt == origin) return false;
+            if(rt == origin || (origin.block().hasBuilding() && rt.build == origin.build)) return false;
             // Add all of multiblocks
             if(rt.block().hasBuilding()){
                 rt.build.tile().getLinkedTiles(t -> enroute.add(t));
@@ -142,7 +144,9 @@ public class PowerBeam{
             }
             last.set(rt);
             // ew
-            return (!origin.block().hasBuilding() || rt.build != origin.build) && (rt.block().absorbLasers || canReflectMirror(rt));
+            return
+                    (rt.block() instanceof MirrorBlock && ((MirrorBlock.MirrorBlockBuilding) rt.build).shouldReflectAngle(rotation + 180f)) ||
+                            rt.build instanceof ICatchPowerBeam || rt.block().absorbLasers;
         });
 
         // Catch
@@ -164,7 +168,7 @@ public class PowerBeam{
 
         // Deal with child beam
         Tile t = last.get();
-        if(canReflectMirror(t)){
+        if(t.block() instanceof MirrorBlock && ((MirrorBlock.MirrorBlockBuilding) t.build).shouldReflectAngle(rotation + 180f)){
             if(!hasChild()){
                 childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
             }else{
@@ -174,12 +178,6 @@ public class PowerBeam{
             childBeam.remove();
             childBeam = null;
         }
-    }
-
-    // Check rotation of mirror
-    protected boolean canReflectMirror(Tile tile){
-        return tile.block() instanceof SemiMirrorBlock ||
-                (tile.block() instanceof MirrorBlock && Util.distance(rotation - 180f, (Float) tile.build.config()) < 90f);
     }
 
     // Ensure no infinite beam loop
@@ -219,7 +217,9 @@ public class PowerBeam{
 
         Building originBuilding = Vars.world.tileWorld(x, y).block().hasBuilding() ? Vars.world.tileWorld(x, y).build : null;
         enroute.forEach(tile -> {
-            if(tile.block().hasBuilding() && tile.build != originBuilding && tile.build != catchPowerBeam && !(tile.block() instanceof MirrorBlock && canReflectMirror(tile))){
+            if((tile.block().hasBuilding() && tile.build != originBuilding) &&
+                    (!(tile.build instanceof IDamagePowerBeam) || ((IDamagePowerBeam) tile.build).damage(this))){
+                //!= catchPowerBeam && !(tile.block() instanceof MirrorBlock && canReflectMirror(tile))){
                 //todo balance
                 tile.build.damageContinuous(power);
             }

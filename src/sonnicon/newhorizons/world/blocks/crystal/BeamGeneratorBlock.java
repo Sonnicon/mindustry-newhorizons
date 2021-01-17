@@ -15,7 +15,6 @@ public class BeamGeneratorBlock extends PowerGenerator{
     public BeamGeneratorBlock(String name){
         super(name);
 
-        absorbLasers = true;
         destructible = true;
         rotate = true;
         solid = true;
@@ -62,6 +61,11 @@ public class BeamGeneratorBlock extends PowerGenerator{
         @Override
         public ArrayList<PowerBeam> getPowerBeams(){
             return catchedBeams;
+        }
+
+        @Override
+        public boolean damage(PowerBeam beam){
+            return !shouldCatch(beam);
         }
     }
 }

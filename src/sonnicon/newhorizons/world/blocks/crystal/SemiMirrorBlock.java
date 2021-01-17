@@ -37,5 +37,10 @@ public class SemiMirrorBlock extends MirrorBlock{
             }
             return super.collision(other);
         }
+
+        @Override
+        public boolean shouldReflectAngle(float rotation){
+            return true;
+        }
     }
 }

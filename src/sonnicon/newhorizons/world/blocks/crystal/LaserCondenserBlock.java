@@ -21,6 +21,7 @@ import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.entities.PowerBeam;
 import sonnicon.newhorizons.types.ICatchPowerBeam;
+import sonnicon.newhorizons.types.IDamagePowerBeam;
 import sonnicon.newhorizons.types.Pair;
 import sonnicon.newhorizons.world.MultiblockBuilding;
 
@@ -42,7 +43,6 @@ public class LaserCondenserBlock extends Block{
         update = true;
         hasLiquids = true;
         sync = true;
-        absorbLasers = true;
         //todo balance
         liquidCapacity = 20f;
         consumes.add(new ConsumeLiquidFilter(coolantFilter, 0f)).update(false);
@@ -88,8 +88,12 @@ public class LaserCondenserBlock extends Block{
         @Override
         public void updateTile(){
             energies.addLast(energies.pop().set(Time.delta, energy * Time.delta));
-            float avg = ((float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum()));
-            float power = avg + (float) catchedPowerBeams.stream().mapToDouble(PowerBeam::getPower).sum() / beamCount;
+            float avg = (float) (energies.stream().mapToDouble(Pair::getY).sum() / energies.stream().mapToDouble(Pair::getX).sum());
+            float catchedPower = (float) catchedPowerBeams.stream().mapToDouble(PowerBeam::getPower).sum();
+            float power = (avg + catchedPower) / beamCount;
+            //todo balancing
+
+
             for(int i = 0; i < beams.length; i++){
                 beams[i].setPower(beamCount > i ? power : 0f);
             }
@@ -104,7 +108,7 @@ public class LaserCondenserBlock extends Block{
                     //todo balancing
                     float bulletEnergy = (other.lifetime() - other.time()) * other.type().damage * 0.005f;
                     float liquidRequired = bulletEnergy * liquids.current().temperature;
-                    if(liquids.currentAmount() > liquidRequired){
+                    if(hasEnoughCoolant(liquidRequired)){
                         bulletEnergy -= bulletEnergy * liquidCapacity / (liquids().total() * 2f);
                         liquids.remove(liquids.current(), liquidRequired);
                     }else{
@@ -138,6 +142,10 @@ public class LaserCondenserBlock extends Block{
                     throw new NumberFormatException();
                 }
             }
+        }
+
+        protected boolean hasEnoughCoolant(float amount){
+            return liquids.currentAmount() > amount;
         }
 
         @Override
@@ -245,7 +253,12 @@ public class LaserCondenserBlock extends Block{
         }
 
         @Override
-        public boolean shouldCatch(PowerBeam beam){
+        public boolean damage(PowerBeam beam){
+            float coolantNeeded = beam.getPower() * Time.delta * 0.1f;
+            if(hasEnoughCoolant(coolantNeeded)){
+                liquids.remove(liquids.current(), coolantNeeded);
+                return false;
+            }
             return true;
         }
 
