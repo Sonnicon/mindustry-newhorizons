@@ -263,6 +263,46 @@ public class LaserCondenserBlock extends Block{
         }
 
         @Override
+        public boolean shouldCatch(PowerBeam beam){
+            // aaa
+            Util.blockRotationOffset(temp, x, y, Vars.tilesize * 1.5f, rotation() - 2);
+            float adj, opp = Math.abs(temp.getY() - beam.getY());
+            // Don't check if angle is always bad
+            if(rotation() % 2 == 0){
+                if(rotation == 0){
+                    if(beam.getRotation() >= 90f && beam.getRotation() <= 270f){
+                        return false;
+                    }
+                }else if(beam.getRotation() <= 90f || beam.getRotation() >= 270f){
+                    return false;
+                }
+                adj = Math.abs(temp.getX() - beam.getX());
+            }else{
+                if(rotation == 1){
+                    if(beam.getRotation() <= 180f){
+                        return false;
+                    }
+                }else if(beam.getRotation() >= 180f){
+                    return false;
+                }
+                adj = opp;
+                opp = Math.abs(temp.getX() - beam.getX());
+            }
+            float calcopp;
+            // tan(90) fix
+            if((beam.getRotation() + 90f) % 180f == 0){
+                calcopp = 0f;
+            }else{
+                calcopp = (float) Math.abs(Math.tan(Math.toRadians(beam.getRotation())) * adj);
+            }
+            if(calcopp >= opp - 12.01f && calcopp <= opp + 12.01f){
+                return rotation != 1;
+            }else{
+                return rotation == 1;
+            }
+        }
+
+        @Override
         public void addPowerBeam(PowerBeam beam){
             catchedPowerBeams.add(beam);
         }

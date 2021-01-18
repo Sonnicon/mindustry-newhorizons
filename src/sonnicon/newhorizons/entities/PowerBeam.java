@@ -73,7 +73,7 @@ public class PowerBeam{
     public void set(float x, float y, float rotation, PowerBeam parentBeam){
         this.x = x;
         this.y = y;
-        this.rotation = rotation % 360f;
+        this.rotation = (rotation % 360f + 360f) % 360f;
         if(parentBeam != null){
             this.parentBeam = parentBeam;
             setPower(parentBeam.power);
@@ -113,7 +113,7 @@ public class PowerBeam{
             distanceY = (rotation < 180f) ? -y : Vars.world.height() * Vars.tilesize;
         }
         // For later recalculation, otherwise would be in corner
-        if(rotation + 45f % 90f == 0 && distanceX > distanceY){
+        if(rotation + 45f % 90f == 0 && distanceX > distanceY && distanceY != 0){
             distanceX = 0f;
         }
 
@@ -256,7 +256,7 @@ public class PowerBeam{
     }
 
     public void setRotation(float rotation){
-        this.rotation = rotation % 360f;
+        this.rotation = (rotation % 360f + 360f) % 360f;
         invalidate();
     }
 
@@ -274,6 +274,14 @@ public class PowerBeam{
 
     public boolean hasChild(){
         return childBeam != null;
+    }
+
+    public float getX(){
+        return x;
+    }
+
+    public float getY(){
+        return y;
     }
 
     public float getEndX(){

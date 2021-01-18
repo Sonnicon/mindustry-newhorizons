@@ -20,7 +20,7 @@ public class Util{
     // Offset x and y by distance based on rotation (like sin but only cardinal directions)
     public static Pair<Float, Float> blockRotationOffset(Pair<Float, Float> output, float x, float y, float distance, int rotation){
         // could use trigonometric functions, but this is faster for block rotations
-        switch(rotation % 4){
+        switch((rotation % 4 + 4) % 4){
             case (0):{
                 return output.set(x + distance, y);
             }
