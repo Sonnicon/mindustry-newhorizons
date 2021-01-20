@@ -11,8 +11,8 @@ import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.types.ICatchPowerBeam;
 import sonnicon.newhorizons.types.IDamagePowerBeam;
-import sonnicon.newhorizons.world.blocks.crystal.LaserCondenserBlock;
-import sonnicon.newhorizons.world.blocks.crystal.MirrorBlock;
+import sonnicon.newhorizons.world.blocks.beam.LaserCondenserBlock;
+import sonnicon.newhorizons.world.blocks.beam.MirrorBlock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +51,9 @@ public class PowerBeam{
         Events.run(EventType.Trigger.update, () -> {
             // Update from end because removals can happen
             for(int i = beams.size() - 1; i >= 0; i--){
+                if(i >= beams.size()){
+                    continue;
+                }
                 beams.get(i).update();
             }
         });
@@ -144,9 +147,9 @@ public class PowerBeam{
             }
             last.set(rt);
             // ew
-            return
-                    (rt.block() instanceof MirrorBlock && ((MirrorBlock.MirrorBlockBuilding) rt.build).shouldReflectAngle(rotation + 180f)) ||
-                            rt.build instanceof ICatchPowerBeam || rt.block().absorbLasers;
+            return (rt.block() instanceof MirrorBlock && ((MirrorBlock.MirrorBlockBuilding) rt.build).shouldReflectAngle(rotation + 180f)) ||
+                    (rt.build instanceof ICatchPowerBeam && ((ICatchPowerBeam) rt.build).shouldCatch(this))
+                    || rt.block().absorbLasers;
         });
 
         // Catch
@@ -217,13 +220,22 @@ public class PowerBeam{
 
         Building originBuilding = Vars.world.tileWorld(x, y).block().hasBuilding() ? Vars.world.tileWorld(x, y).build : null;
         enroute.forEach(tile -> {
-            if((tile.block().hasBuilding() && tile.build != originBuilding) &&
-                    (!(tile.build instanceof IDamagePowerBeam) || ((IDamagePowerBeam) tile.build).damage(this))){
-                //!= catchPowerBeam && !(tile.block() instanceof MirrorBlock && canReflectMirror(tile))){
-                //todo balance
-                tile.build.damageContinuous(power);
+            Building build = tile.build;
+            if(build != null && build != originBuilding){
+                if(build instanceof IDamagePowerBeam){
+                    if(((IDamagePowerBeam) build).shouldDamage(this)){
+                        ((IDamagePowerBeam) build).damage(this);
+                    }
+                }else{
+                    damage(build);
+                }
             }
         });
+    }
+
+    public void damage(Building building){
+        //todo balance
+        building.damageContinuous(power);
     }
 
     // Draw beam and child
@@ -290,6 +302,10 @@ public class PowerBeam{
 
     public float getEndY(){
         return endY;
+    }
+
+    public ICatchPowerBeam getCatching(){
+        return catchPowerBeam;
     }
 
     // Remove beam and all accessors

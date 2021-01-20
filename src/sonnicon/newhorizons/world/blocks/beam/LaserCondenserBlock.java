@@ -1,4 +1,4 @@
-package sonnicon.newhorizons.world.blocks.crystal;
+package sonnicon.newhorizons.world.blocks.beam;
 
 import arc.Core;
 import arc.func.Boolf;
@@ -112,7 +112,8 @@ public class LaserCondenserBlock extends Block{
                         bulletEnergy -= bulletEnergy * liquidCapacity / (liquids().total() * 2f);
                         liquids.remove(liquids.current(), liquidRequired);
                     }else{
-                        super.collision(other);
+                        //todo balance
+                        damageLens(other.damage());
                     }
                     energy += bulletEnergy;
                 }else{
@@ -203,6 +204,18 @@ public class LaserCondenserBlock extends Block{
             updateBeamCount();
         }
 
+        public void damageLens(float amount, boolean withEffect){
+            float pre = hitTime;
+            damageLens(amount);
+            if(!withEffect){
+                hitTime = pre;
+            }
+        }
+
+        public void damageContinuousLens(float amount){
+            damageLens(amount * Time.delta, hitTime <= -10 + hitDuration);
+        }
+
         @Override
         public boolean damaged(){
             return super.damaged() || lensHealth < maxLensHealth;
@@ -250,16 +263,6 @@ public class LaserCondenserBlock extends Block{
             float x = read.f(), y = read.f();
             energies.forEach(pair -> pair.set(x, y));
             lensHealth = read.f();
-        }
-
-        @Override
-        public boolean damage(PowerBeam beam){
-            float coolantNeeded = beam.getPower() * Time.delta * 0.1f;
-            if(hasEnoughCoolant(coolantNeeded)){
-                liquids.remove(liquids.current(), coolantNeeded);
-                return false;
-            }
-            return true;
         }
 
         @Override
@@ -315,6 +318,26 @@ public class LaserCondenserBlock extends Block{
         @Override
         public ArrayList<PowerBeam> getPowerBeams(){
             return catchedPowerBeams;
+        }
+
+        @Override
+        public boolean shouldDamage(PowerBeam beam){
+            return true;
+        }
+
+        @Override
+        public void damage(PowerBeam beam){
+            if(beam.getCatching() == this){
+                float coolantNeeded = beam.getPower() * Time.delta * 0.1f;
+                if(hasEnoughCoolant(coolantNeeded)){
+                    liquids.remove(liquids.current(), coolantNeeded);
+                }else{
+                    //todo balance
+                    damageLens(beam.getPower());
+                }
+            }else{
+                beam.damage(this);
+            }
         }
     }
 }

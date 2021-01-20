@@ -17,7 +17,7 @@ public interface ICatchPowerBeam extends IDamagePowerBeam{
     ArrayList<PowerBeam> getPowerBeams();
 
     @Override
-    default boolean damage(PowerBeam beam){
+    default boolean shouldDamage(PowerBeam beam){
         return false;
     }
 }

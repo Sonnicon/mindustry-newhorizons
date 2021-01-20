@@ -1,4 +1,4 @@
-package sonnicon.newhorizons.world.blocks.crystal;
+package sonnicon.newhorizons.world.blocks.beam;
 
 import mindustry.world.Tile;
 import mindustry.world.blocks.power.PowerGenerator;
@@ -64,8 +64,13 @@ public class BeamGeneratorBlock extends PowerGenerator{
         }
 
         @Override
-        public boolean damage(PowerBeam beam){
+        public boolean shouldDamage(PowerBeam beam){
             return !shouldCatch(beam);
+        }
+
+        @Override
+        public void damage(PowerBeam beam){
+            beam.damage(this);
         }
     }
 }

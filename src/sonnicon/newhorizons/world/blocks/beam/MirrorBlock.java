@@ -1,4 +1,4 @@
-package sonnicon.newhorizons.world.blocks.crystal;
+package sonnicon.newhorizons.world.blocks.beam;
 
 import arc.Core;
 import arc.graphics.g2d.Draw;
@@ -132,8 +132,13 @@ public class MirrorBlock extends Block{
         }
 
         @Override
-        public boolean damage(PowerBeam beam){
+        public boolean shouldDamage(PowerBeam beam){
             return !shouldReflectAngle(beam.getRotation() - 180f);
+        }
+
+        @Override
+        public void damage(PowerBeam beam){
+            beam.damage(this);
         }
     }
 }

@@ -4,5 +4,7 @@ import sonnicon.newhorizons.entities.PowerBeam;
 
 public interface IDamagePowerBeam{
 
-    boolean damage(PowerBeam beam);
+    boolean shouldDamage(PowerBeam beam);
+
+    void damage(PowerBeam beam);
 }

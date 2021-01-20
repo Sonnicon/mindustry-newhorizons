@@ -50,7 +50,6 @@ public class Multiblock{
         // (max + min) / 2
         drawOffsetX = (Math.max(0, blocks.stream().max(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x) +
                 Math.min(0, blocks.stream().min(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x)) / 2f;
-        System.out.println((blocks.stream().max(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x + ", " + blocks.stream().min(Comparator.comparingInt(x -> x.x)).orElseThrow(NoSuchElementException::new).x));
         drawOffsetY = (Math.max(0, blocks.stream().max(Comparator.comparingInt(x -> x.y)).orElseThrow(NoSuchElementException::new).y) +
                 Math.min(0, blocks.stream().min(Comparator.comparingInt(x -> x.y)).orElseThrow(NoSuchElementException::new).y)) / 2f;
 
