@@ -13,7 +13,7 @@ import sonnicon.newhorizons.types.ILoadable;
 import java.util.Arrays;
 
 public class Vars{
-    public static final ILoadable[] loadables = {
+    protected static final ILoadable[] loadables = {
             new Blocks(),
             new Multiblocks(),
             new Types()

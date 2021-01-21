@@ -104,7 +104,7 @@ public class LaserCondenserBlock extends Block{
         public boolean collision(Bullet other){
             if(efficiency() > 0f && Util.distance(other.rotation(), rotation() * 90f) < 90f &&
                     isOutsideDirection(other.x() - other.deltaX(), other.y() - other.deltaY())){
-                if(Types.lasers.contains(other.type())){
+                if(Types.isLaser(other.type())){
                     //todo balancing
                     float bulletEnergy = (other.lifetime() - other.time()) * other.type().damage * 0.005f;
                     float liquidRequired = bulletEnergy * liquids.current().temperature;

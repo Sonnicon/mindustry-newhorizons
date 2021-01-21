@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 
 public class Util{
 
-    protected static Field blockField;
+    private static Field blockField;
 
     // Shortest distance between two angles (deg)
     public static float distance(float a, float b){

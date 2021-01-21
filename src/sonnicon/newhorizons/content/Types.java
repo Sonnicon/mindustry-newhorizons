@@ -11,7 +11,7 @@ import sonnicon.newhorizons.types.IInit;
 import java.util.HashSet;
 
 public class Types implements IInit{
-    public static final HashSet<BulletType> lasers = new HashSet<>();
+    protected static final HashSet<BulletType> lasers = new HashSet<>();
 
     @Override
     public void init(){
@@ -20,5 +20,9 @@ public class Types implements IInit{
                 bulletType instanceof LaserBoltBulletType ||
                 bulletType instanceof LaserBulletType)
             .list()));
+    }
+
+    public static boolean isLaser(BulletType type){
+        return lasers.contains(type);
     }
 }

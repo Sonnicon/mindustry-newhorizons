@@ -14,7 +14,7 @@ public class SemiMirrorBlock extends MirrorBlock{
         @Override
         public boolean collision(Bullet other){
             BulletType type = other.type();
-            if(Types.lasers.contains(type)){
+            if(Types.isLaser(type)){
                 float time = other.lifetime - (other.lifetime() - other.time()) / 2;
                 int angle = (180 - (int) other.rotation()) % 360;
 

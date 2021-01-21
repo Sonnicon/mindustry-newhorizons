@@ -52,7 +52,7 @@ public class CrystalBlock extends Block{
         @Override
         public boolean collision(Bullet other){
             BulletType type = other.type();
-            if(Types.lasers.contains(type)){
+            if(Types.isLaser(type)){
                 for(int i = 0; i < 3; i++){
                     Bullet b = type.create(this, null, x(), y(), random.nextInt(360));
                     b.time(other.time() * 0.9f);

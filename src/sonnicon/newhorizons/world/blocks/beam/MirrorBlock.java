@@ -96,7 +96,7 @@ public class MirrorBlock extends Block{
         public boolean collision(Bullet other){
             float bRotation = (180f - other.rotation()) % 360f;
             BulletType type = other.type();
-            if(Types.lasers.contains(type) && shouldReflectAngle(bRotation)){
+            if(Types.isLaser(type) && shouldReflectAngle(bRotation)){
                 float bounceAngle = bRotation - 2f * config();
                 if(type.collidesTeam){
                     Bullet b = type.create(this, null, other.x(), other.y(), bounceAngle);

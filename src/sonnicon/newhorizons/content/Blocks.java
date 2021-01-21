@@ -12,12 +12,13 @@ import sonnicon.newhorizons.world.blocks.beam.MirrorBlock;
 import sonnicon.newhorizons.world.blocks.beam.SemiMirrorBlock;
 import sonnicon.newhorizons.world.blocks.crystal.*;
 import sonnicon.newhorizons.world.blocks.defence.GlassWallBlock;
+import sonnicon.newhorizons.world.blocks.liquid.PhaseConduitDispenserBlock;
 import sonnicon.newhorizons.world.blocks.sandbox.PowerBeamSpawnerBlock;
 
 import static mindustry.type.ItemStack.with;
 
 public class Blocks implements ILoadContent{
-    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, powerbeamSpawner, beamGenerator;
+    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, powerbeamSpawner, beamGenerator, phaseConduitDispenser;
 
     @Override
     public void loadContent(){
@@ -48,5 +49,8 @@ public class Blocks implements ILoadContent{
         beamGenerator = new BeamGeneratorBlock("beamgenerator");
         beamGenerator.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
         beamGenerator.health = 400;
+
+        phaseConduitDispenser = new PhaseConduitDispenserBlock("phaseConduitDispenser");
+        phaseConduitDispenser.requirements(Category.liquid, with(Items.copper, 30, Items.lead, 25));
     }
 }

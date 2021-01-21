@@ -15,7 +15,7 @@ public class GlassWallBlock extends Wall{
     public class GlassWallBlockBuilding extends Building{
         @Override
         public boolean collide(Bullet other){
-            return !Types.lasers.contains(other.type());
+            return !Types.isLaser(other.type());
         }
     }
 }
