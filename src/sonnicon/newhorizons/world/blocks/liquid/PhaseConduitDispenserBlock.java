@@ -20,6 +20,7 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.Stat;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.types.Pair;
 
@@ -27,9 +28,9 @@ import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
 public class PhaseConduitDispenserBlock extends Block{
-    public float range = 12 * Vars.tilesize;
+    public float range = 12;
     public float speed = 0.5f;
-    protected static final Pair<Float, Float> temp = new Pair<>();
+    protected static final Pair<Integer, Integer> temp = new Pair<>();
 
     public PhaseConduitDispenserBlock(String name){
         super(name);
@@ -51,38 +52,45 @@ public class PhaseConduitDispenserBlock extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.tiles, Blocks.phaseConduit.localizedName);
+    }
+
+    @Override
     public boolean canReplace(Block other){
-        return other == Blocks.phaseConduit;
+        return other == Blocks.phaseConduit || Vars.state.rules.infiniteResources;
     }
 
     public class FountainBlockBuilding extends Building{
-        protected float setting = range / 2f, uptime = 0f;
+        protected int setting = (int) (range / 2f);
+        protected float uptime = 0f;
         protected Tile target;
 
         @Override
-        public Float config(){
+        public Integer config(){
             return setting;
         }
 
         @Override
         public void configure(Object value){
-            setting = (float) value;
+            setting = (int) value;
             target = null;
         }
 
         @Override
         public void buildConfiguration(Table table){
             table.table(Styles.black5, t -> {
-                t.slider(0f, range, 1f, config(), this::configure);
-                t.label(() -> config().toString()).padLeft(8f).minWidth(50f);
+                t.slider(0, range, 1, config(), value -> configure((int) value));
+                t.label(() -> config().toString()).padLeft(8f).minWidth(20f);
             }).margin(4f);
         }
 
         @Override
         public void updateTile(){
             if(target == null){
-                Util.blockRotationOffset(temp, x, y, config(), rotation);
-                target = world.tileWorld(temp.getX(), temp.getY());
+                Util.blockRotationOffset(temp, tileX(), tileY(), config(), rotation);
+                target = world.tile(Math.max(0, Math.min(world.tiles.width, temp.getX())), Math.max(0, Math.min(world.tiles.height, temp.getY())));
                 if(target == null) return;
             }
 
@@ -112,6 +120,9 @@ public class PhaseConduitDispenserBlock extends Block{
         @Override
         public void draw(){
             super.draw();
+            if(target == null){
+                return;
+            }
 
             Draw.z(Layer.power);
 

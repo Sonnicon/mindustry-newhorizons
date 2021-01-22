@@ -37,6 +37,25 @@ public class Util{
         throw new IllegalStateException("If you're seeing this, the code is in what I thought was an unreachable state.\nI could give you advice for what to do. But honestly, why should you trust me? I clearly screwed this up.\nI'm writing a message that should never appear, yet I know it will probably appear someday.\nOn a deep level, I know I'm not up to this task. I'm so sorry.");
     }
 
+    public static Pair<Integer, Integer> blockRotationOffset(Pair<Integer, Integer> output, int x, int y, int distance, int rotation){
+        // could use trigonometric functions, but this is faster for block rotations
+        switch((rotation % 4 + 4) % 4){
+            case (0):{
+                return output.set(x + distance, y);
+            }
+            case (1):{
+                return output.set(x, y + distance);
+            }
+            case (2):{
+                return output.set(x - distance, y);
+            }
+            case (3):{
+                return output.set(x, y - distance);
+            }
+        }
+        throw new IllegalStateException("If you're seeing this, the code is in what I thought was an unreachable state.\nI could give you advice for what to do. But honestly, why should you trust me? I clearly screwed this up.\nI'm writing a message that should never appear, yet I know it will probably appear someday.\nOn a deep level, I know I'm not up to this task. I'm so sorry.");
+    }
+
     // Better this than eternally casting to and from doubles
     public static float ceil(float value){
         if(value > (int) value){
