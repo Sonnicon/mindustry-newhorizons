@@ -27,12 +27,12 @@ import sonnicon.newhorizons.types.Pair;
 import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
 
-public class PhaseConduitDispenserBlock extends Block{
+public class BlockPhaseConduitDispenser extends Block{
     public float range = 12;
     public float speed = 0.5f;
     protected static final Pair<Integer, Integer> temp = new Pair<>();
 
-    public PhaseConduitDispenserBlock(String name){
+    public BlockPhaseConduitDispenser(String name){
         super(name);
 
         destructible = true;
@@ -62,7 +62,7 @@ public class PhaseConduitDispenserBlock extends Block{
         return other == Blocks.phaseConduit || Vars.state.rules.infiniteResources;
     }
 
-    public class FountainBlockBuilding extends Building{
+    public class BuildingPhaseConduitDispenser extends Building{
         protected int setting = (int) (range / 2f);
         protected float uptime = 0f;
         protected Tile target;

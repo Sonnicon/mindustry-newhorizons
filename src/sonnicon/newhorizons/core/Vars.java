@@ -6,7 +6,7 @@ import sonnicon.newhorizons.content.Blocks;
 import sonnicon.newhorizons.content.Multiblocks;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.entities.PowerBeam;
-import sonnicon.newhorizons.types.IInit;
+import sonnicon.newhorizons.types.ILoadInit;
 import sonnicon.newhorizons.types.ILoadContent;
 import sonnicon.newhorizons.types.ILoadable;
 
@@ -23,8 +23,8 @@ public class Vars{
 
     public static void init(){
         Arrays.stream(loadables)
-                .filter(i -> i instanceof IInit)
-                .forEachOrdered(i -> ((IInit) i).init());
+                .filter(i -> i instanceof ILoadInit)
+                .forEachOrdered(i -> ((ILoadInit) i).init());
         PowerBeam.init();
     }
 

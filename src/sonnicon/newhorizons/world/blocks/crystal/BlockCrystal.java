@@ -11,9 +11,9 @@ import sonnicon.newhorizons.content.Types;
 
 import java.util.Random;
 
-public class CrystalBlock extends Block{
+public class BlockCrystal extends Block{
 
-    public CrystalBlock(String name){
+    public BlockCrystal(String name){
         super(name);
         solid = true;
         destructible = true;
@@ -34,8 +34,8 @@ public class CrystalBlock extends Block{
 
     protected final Random random = new Random();
 
-    public class CrystalBlockBuilding extends Building{
-        public CrystalBlockBuilding(){
+    public class BuildingCrystal extends Building{
+        public BuildingCrystal(){
             super();
         }
 

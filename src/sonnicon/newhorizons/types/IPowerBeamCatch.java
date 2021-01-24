@@ -4,7 +4,7 @@ import sonnicon.newhorizons.entities.PowerBeam;
 
 import java.util.ArrayList;
 
-public interface ICatchPowerBeam extends IDamagePowerBeam{
+public interface IPowerBeamCatch extends IPowerBeamDamage{
 
     default boolean shouldCatch(PowerBeam beam){
         return true;

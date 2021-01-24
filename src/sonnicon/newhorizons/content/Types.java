@@ -6,11 +6,11 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LaserBoltBulletType;
 import mindustry.entities.bullet.LaserBulletType;
 import mindustry.game.EventType;
-import sonnicon.newhorizons.types.IInit;
+import sonnicon.newhorizons.types.ILoadInit;
 
 import java.util.HashSet;
 
-public class Types implements IInit{
+public class Types implements ILoadInit{
     protected static final HashSet<BulletType> lasers = new HashSet<>();
 
     @Override

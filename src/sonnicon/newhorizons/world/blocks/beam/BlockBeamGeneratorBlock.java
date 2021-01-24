@@ -3,16 +3,16 @@ package sonnicon.newhorizons.world.blocks.beam;
 import mindustry.world.Tile;
 import mindustry.world.blocks.power.PowerGenerator;
 import sonnicon.newhorizons.entities.PowerBeam;
-import sonnicon.newhorizons.types.ICatchPowerBeam;
+import sonnicon.newhorizons.types.IPowerBeamCatch;
 import sonnicon.newhorizons.world.Multiblock;
-import sonnicon.newhorizons.world.MultiblockBuilding;
+import sonnicon.newhorizons.world.BuildingMultiblock;
 import sonnicon.newhorizons.world.RelativeBlock;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class BeamGeneratorBlock extends PowerGenerator{
-    public BeamGeneratorBlock(String name){
+public class BlockBeamGeneratorBlock extends PowerGenerator{
+    public BlockBeamGeneratorBlock(String name){
         super(name);
 
         destructible = true;
@@ -21,7 +21,7 @@ public class BeamGeneratorBlock extends PowerGenerator{
         update = true;
     }
 
-    public class BeamAbsorberBlockBuilding extends MultiblockBuilding implements ICatchPowerBeam{
+    public class BuildingBeamGenerator extends BuildingMultiblock implements IPowerBeamCatch{
         protected ArrayList<PowerBeam> catchedBeams = new ArrayList<>();
         protected Tile catchyTile;
 

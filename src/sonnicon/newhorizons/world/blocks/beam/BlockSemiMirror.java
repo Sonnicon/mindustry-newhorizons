@@ -4,13 +4,13 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;
 import sonnicon.newhorizons.content.Types;
 
-public class SemiMirrorBlock extends MirrorBlock{
+public class BlockSemiMirror extends BlockMirror{
 
-    public SemiMirrorBlock(String name){
+    public BlockSemiMirror(String name){
         super(name);
     }
 
-    public class SemiMirrorBlockBuilding extends MirrorBlockBuilding{
+    public class BuildingSemiMirror extends BuildingMirror{
         @Override
         public boolean collision(Bullet other){
             BulletType type = other.type();

@@ -7,8 +7,8 @@ import mindustry.gen.Building;
 import mindustry.world.Block;
 import sonnicon.newhorizons.entities.PowerBeam;
 
-public class PowerBeamSpawnerBlock extends Block{
-    public PowerBeamSpawnerBlock(String name){
+public class BlockPowerBeamSpawner extends Block{
+    public BlockPowerBeamSpawner(String name){
         super(name);
 
         destructible = true;
@@ -16,10 +16,10 @@ public class PowerBeamSpawnerBlock extends Block{
         configurable = true;
         rotate = true;
 
-        config(Float.class, PowerBeamSpawnerBlockBuilding::configure);
+        config(Float.class, BuildingPowerBeamSpawner::configure);
     }
 
-    public class PowerBeamSpawnerBlockBuilding extends Building{
+    public class BuildingPowerBeamSpawner extends Building{
         protected PowerBeam beam;
 
         @Override

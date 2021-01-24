@@ -5,15 +5,15 @@ import mindustry.type.Category;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 import sonnicon.newhorizons.types.ILoadContent;
-import sonnicon.newhorizons.world.blocks.MultiblockAssemblyBlock;
-import sonnicon.newhorizons.world.blocks.beam.BeamGeneratorBlock;
-import sonnicon.newhorizons.world.blocks.beam.LaserCondenserBlock;
-import sonnicon.newhorizons.world.blocks.beam.MirrorBlock;
-import sonnicon.newhorizons.world.blocks.beam.SemiMirrorBlock;
-import sonnicon.newhorizons.world.blocks.crystal.*;
-import sonnicon.newhorizons.world.blocks.defence.GlassWallBlock;
-import sonnicon.newhorizons.world.blocks.liquid.PhaseConduitDispenserBlock;
-import sonnicon.newhorizons.world.blocks.sandbox.PowerBeamSpawnerBlock;
+import sonnicon.newhorizons.world.blocks.BlockMultiblockAssembly;
+import sonnicon.newhorizons.world.blocks.beam.BlockBeamGeneratorBlock;
+import sonnicon.newhorizons.world.blocks.beam.BlockLaserCondenser;
+import sonnicon.newhorizons.world.blocks.beam.BlockMirror;
+import sonnicon.newhorizons.world.blocks.beam.BlockSemiMirror;
+import sonnicon.newhorizons.world.blocks.crystal.BlockCrystal;
+import sonnicon.newhorizons.world.blocks.defence.BlockGlassWall;
+import sonnicon.newhorizons.world.blocks.liquid.BlockPhaseConduitDispenser;
+import sonnicon.newhorizons.world.blocks.sandbox.BlockPowerBeamSpawner;
 
 import static mindustry.type.ItemStack.with;
 
@@ -23,34 +23,34 @@ public class Blocks implements ILoadContent{
     @Override
     public void loadContent(){
         //todo balancing
-        crystalWhite = new CrystalBlock("crystal-white");
+        crystalWhite = new BlockCrystal("crystal-white");
         crystalWhite.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-        mirror = new MirrorBlock("mirror");
+        mirror = new BlockMirror("mirror");
         mirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-        semimirror = new SemiMirrorBlock("semimirror");
+        semimirror = new BlockSemiMirror("semimirror");
         semimirror.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-        multiblockAssemblyBlock = new MultiblockAssemblyBlock("multiblock-assembler");
+        multiblockAssemblyBlock = new BlockMultiblockAssembly("multiblock-assembler");
         multiblockAssemblyBlock.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
 
-        glassWall = new GlassWallBlock("metaglass-wall");
+        glassWall = new BlockGlassWall("metaglass-wall");
         glassWall.requirements(Category.defense, with(Items.metaglass, 6));
         glassWall.health = 100;
 
-        laserCondenser = new LaserCondenserBlock("lasercondenser");
+        laserCondenser = new BlockLaserCondenser("lasercondenser");
         laserCondenser.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
         laserCondenser.health = 400;
 
-        powerbeamSpawner = new PowerBeamSpawnerBlock("powerbeamspawner");
+        powerbeamSpawner = new BlockPowerBeamSpawner("powerbeamspawner");
         powerbeamSpawner.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
 
-        beamGenerator = new BeamGeneratorBlock("beamgenerator");
+        beamGenerator = new BlockBeamGeneratorBlock("beamgenerator");
         beamGenerator.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
         beamGenerator.health = 400;
 
-        phaseConduitDispenser = new PhaseConduitDispenserBlock("phaseConduitDispenser");
+        phaseConduitDispenser = new BlockPhaseConduitDispenser("phaseConduitDispenser");
         phaseConduitDispenser.requirements(Category.liquid, with(Items.copper, 30, Items.lead, 25));
     }
 }

@@ -2,7 +2,7 @@ package sonnicon.newhorizons.types;
 
 import sonnicon.newhorizons.entities.PowerBeam;
 
-public interface IDamagePowerBeam{
+public interface IPowerBeamDamage{
 
     boolean shouldDamage(PowerBeam beam);
 

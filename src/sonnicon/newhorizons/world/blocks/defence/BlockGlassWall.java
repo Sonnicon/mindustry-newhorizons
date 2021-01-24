@@ -5,14 +5,14 @@ import mindustry.gen.Bullet;
 import mindustry.world.blocks.defense.Wall;
 import sonnicon.newhorizons.content.Types;
 
-public class GlassWallBlock extends Wall{
-    public GlassWallBlock(String name){
+public class BlockGlassWall extends Wall{
+    public BlockGlassWall(String name){
         super(name);
         hasShadow = false;
         fillsTile = false;
     }
 
-    public class GlassWallBlockBuilding extends Building{
+    public class BuildingGlassWall extends Building{
         @Override
         public boolean collide(Bullet other){
             return !Types.isLaser(other.type());

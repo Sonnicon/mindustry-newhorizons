@@ -15,11 +15,11 @@ import mindustry.world.Block;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Vars;
 import sonnicon.newhorizons.entities.PowerBeam;
-import sonnicon.newhorizons.types.IDamagePowerBeam;
+import sonnicon.newhorizons.types.IPowerBeamDamage;
 
 import static sonnicon.newhorizons.core.Util.distance;
 
-public class MirrorBlock extends Block{
+public class BlockMirror extends Block{
     protected TextureRegion top;
     protected Rect mirrorHitbox;
 
@@ -27,14 +27,14 @@ public class MirrorBlock extends Block{
     protected static Vec2 tmp2 = new Vec2();
 
 
-    public MirrorBlock(String name){
+    public BlockMirror(String name){
         super(name);
         configurable = true;
         destructible = true;
         solid = true;
         size = 2;
 
-        config(Float.class, (MirrorBlockBuilding building, Float value) -> building.setting = value);
+        config(Float.class, (BuildingMirror building, Float value) -> building.setting = value);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MirrorBlock extends Block{
         return new Rect().setCentered(0, 0, mindustry.Vars.tilesize / 4f * size, mindustry.Vars.tilesize * size + 2f);
     }
 
-    public class MirrorBlockBuilding extends Building implements IDamagePowerBeam{
+    public class BuildingMirror extends Building implements IPowerBeamDamage{
         protected float setting = 0;
 
         @Override

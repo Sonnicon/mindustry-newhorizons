@@ -9,10 +9,10 @@ import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
-import sonnicon.newhorizons.types.ICatchPowerBeam;
-import sonnicon.newhorizons.types.IDamagePowerBeam;
-import sonnicon.newhorizons.world.blocks.beam.LaserCondenserBlock;
-import sonnicon.newhorizons.world.blocks.beam.MirrorBlock;
+import sonnicon.newhorizons.types.IPowerBeamCatch;
+import sonnicon.newhorizons.types.IPowerBeamDamage;
+import sonnicon.newhorizons.world.blocks.beam.BlockLaserCondenser;
+import sonnicon.newhorizons.world.blocks.beam.BlockMirror;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ public class PowerBeam{
     // Tiles on beam path (reduce recalculations)
     protected HashSet<Tile> enroute = new HashSet<>();
     // Object currently catching the beam
-    protected ICatchPowerBeam catchPowerBeam;
+    protected IPowerBeamCatch catchPowerBeam;
 
     // Register events
     public static void init(){
@@ -147,8 +147,8 @@ public class PowerBeam{
             }
             last.set(rt);
             // ew
-            return (rt.block() instanceof MirrorBlock && ((MirrorBlock.MirrorBlockBuilding) rt.build).shouldReflectAngle(rotation + 180f)) ||
-                    (rt.build instanceof ICatchPowerBeam && ((ICatchPowerBeam) rt.build).shouldCatch(this))
+            return (rt.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) rt.build).shouldReflectAngle(rotation + 180f)) ||
+                    (rt.build instanceof IPowerBeamCatch && ((IPowerBeamCatch) rt.build).shouldCatch(this))
                     || rt.block().absorbLasers;
         });
 
@@ -157,8 +157,8 @@ public class PowerBeam{
         endX = lastTile.worldx();
         endY = lastTile.worldy();
         if(shouldCatch(lastTile)){
-            ((ICatchPowerBeam) lastTile.build).addPowerBeam(this);
-            catchPowerBeam = (ICatchPowerBeam) lastTile.build;
+            ((IPowerBeamCatch) lastTile.build).addPowerBeam(this);
+            catchPowerBeam = (IPowerBeamCatch) lastTile.build;
         }
 
         // Both lengths to last tile
@@ -171,7 +171,7 @@ public class PowerBeam{
 
         // Deal with child beam
         Tile t = last.get();
-        if(t.block() instanceof MirrorBlock && ((MirrorBlock.MirrorBlockBuilding) t.build).shouldReflectAngle(rotation + 180f)){
+        if(t.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) t.build).shouldReflectAngle(rotation + 180f)){
             if(!hasChild()){
                 childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
             }else{
@@ -185,10 +185,10 @@ public class PowerBeam{
 
     // Ensure no infinite beam loop
     protected boolean shouldCatch(Tile lastTile){
-        if(lastTile.build instanceof ICatchPowerBeam &&
-                ((ICatchPowerBeam) lastTile.build).shouldCatch(this)){
-            if(lastTile.block() instanceof LaserCondenserBlock){
-                Set<PowerBeam> beams = Arrays.stream(((LaserCondenserBlock.LaserCondenserBlockBuilding) lastTile.build).beams)
+        if(lastTile.build instanceof IPowerBeamCatch &&
+                ((IPowerBeamCatch) lastTile.build).shouldCatch(this)){
+            if(lastTile.block() instanceof BlockLaserCondenser){
+                Set<PowerBeam> beams = Arrays.stream(((BlockLaserCondenser.BuildingLaserCondenser) lastTile.build).beams)
                         .collect(Collectors.toSet());
                 PowerBeam pb = this;
                 while(pb != null){
@@ -222,9 +222,9 @@ public class PowerBeam{
         enroute.forEach(tile -> {
             Building build = tile.build;
             if(build != null && build != originBuilding){
-                if(build instanceof IDamagePowerBeam){
-                    if(((IDamagePowerBeam) build).shouldDamage(this)){
-                        ((IDamagePowerBeam) build).damage(this);
+                if(build instanceof IPowerBeamDamage){
+                    if(((IPowerBeamDamage) build).shouldDamage(this)){
+                        ((IPowerBeamDamage) build).damage(this);
                     }
                 }else{
                     damage(build);
@@ -304,7 +304,7 @@ public class PowerBeam{
         return endY;
     }
 
-    public ICatchPowerBeam getCatching(){
+    public IPowerBeamCatch getCatching(){
         return catchPowerBeam;
     }
 

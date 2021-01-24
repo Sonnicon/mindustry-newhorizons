@@ -1,5 +1,5 @@
 package sonnicon.newhorizons.types;
 
-public interface IInit extends ILoadable{
+public interface ILoadInit extends ILoadable{
     void init();
 }

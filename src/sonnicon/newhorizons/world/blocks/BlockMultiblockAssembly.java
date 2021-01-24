@@ -15,9 +15,9 @@ import sonnicon.newhorizons.world.RelativeBlock;
 
 import static mindustry.Vars.ui;
 
-public class MultiblockAssemblyBlock extends Block{
+public class BlockMultiblockAssembly extends Block{
 
-    public MultiblockAssemblyBlock(String name){
+    public BlockMultiblockAssembly(String name){
         super(name);
 
         destructible = true;
@@ -26,7 +26,7 @@ public class MultiblockAssemblyBlock extends Block{
         consumesTap = true;
     }
 
-    public class MultiblockAssemblyBlockBuilding extends Building{
+    public class BuildingMultiblockAssembly extends Building{
         public Multiblock selected = null;
 
         @Override

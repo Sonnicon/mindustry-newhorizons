@@ -5,7 +5,7 @@ import arc.util.io.Reads;
 import mindustry.Vars;
 import mindustry.gen.Building;
 
-public class MultiblockBuilding extends Building{
+public abstract class BuildingMultiblock extends Building{
     private boolean readed = false;
 
     @Override

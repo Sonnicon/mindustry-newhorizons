@@ -20,21 +20,20 @@ import sonnicon.newhorizons.content.Blocks;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.entities.PowerBeam;
-import sonnicon.newhorizons.types.ICatchPowerBeam;
-import sonnicon.newhorizons.types.IDamagePowerBeam;
+import sonnicon.newhorizons.types.IPowerBeamCatch;
 import sonnicon.newhorizons.types.Pair;
-import sonnicon.newhorizons.world.MultiblockBuilding;
+import sonnicon.newhorizons.world.BuildingMultiblock;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
-public class LaserCondenserBlock extends Block{
+public class BlockLaserCondenser extends Block{
     public float maxLensHealth = 200f;
     protected final float bound3 = maxLensHealth * 0.3f, bound2 = maxLensHealth * 0.6f;
     protected static final Boolf<Liquid> coolantFilter = liquid -> liquid.temperature <= 0.5f;
 
-    public LaserCondenserBlock(String name){
+    public BlockLaserCondenser(String name){
         super(name);
 
         destructible = true;
@@ -50,7 +49,7 @@ public class LaserCondenserBlock extends Block{
 
     @Override
     public void setBars(){
-        bars.add("lens-health", (LaserCondenserBlockBuilding building) -> new Bar("stat.lens-health", Pal.health, () -> building.lensHealth / maxLensHealth).blink(Color.white));
+        bars.add("lens-health", (BuildingLaserCondenser building) -> new Bar("stat.lens-health", Pal.health, () -> building.lensHealth / maxLensHealth).blink(Color.white));
         super.setBars();
     }
 
@@ -77,7 +76,7 @@ public class LaserCondenserBlock extends Block{
     protected static final int meanSize = 40;
     protected static final Random random = new Random();
 
-    public class LaserCondenserBlockBuilding extends MultiblockBuilding implements ICatchPowerBeam{
+    public class BuildingLaserCondenser extends BuildingMultiblock implements IPowerBeamCatch{
         protected float energy = 0f, lensHealth = maxLensHealth;
         protected LinkedList<Pair<Float, Float>> energies;
         public PowerBeam[] beams = new PowerBeam[3];

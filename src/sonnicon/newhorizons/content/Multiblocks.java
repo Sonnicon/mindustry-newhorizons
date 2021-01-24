@@ -1,8 +1,10 @@
 package sonnicon.newhorizons.content;
 
 
+import mindustry.world.Block;
 import sonnicon.newhorizons.types.ILoadContent;
 import sonnicon.newhorizons.world.Multiblock;
+import sonnicon.newhorizons.world.RelativeBlock;
 
 import static mindustry.content.Blocks.*;
 import static sonnicon.newhorizons.world.RelativeBlock.relativeBlock;
