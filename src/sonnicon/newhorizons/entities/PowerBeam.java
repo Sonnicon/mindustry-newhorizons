@@ -9,6 +9,7 @@ import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
+import sonnicon.newhorizons.graphics.Shaders;
 import sonnicon.newhorizons.types.IPowerBeamCatch;
 import sonnicon.newhorizons.types.IPowerBeamDamage;
 import sonnicon.newhorizons.world.blocks.beam.BlockLaserCondenser;
@@ -242,9 +243,12 @@ public class PowerBeam{
     public void draw(){
         if(!hasParent() && (length <= 0f || !isOn())) return;
         //todo make shader work
-        Draw.draw(Layer.effect, () ->
-                Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power)
-        );
+        Draw.draw(Layer.effect, () -> {
+            Shaders.powerbeam.set(this);
+            Draw.shader(Shaders.powerbeam);
+            Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power);
+            Draw.shader();
+        });
         if(hasChild()){
             childBeam.draw();
         }
