@@ -41,11 +41,10 @@ public class Shaders implements ILoadContent{
             temp.set(beam.getX(), beam.getY());
             Core.camera.project(temp);
             setUniformf("u_time", Time.globalTime / 100f);
-            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
             setUniformf("u_scale", mindustry.Vars.renderer.getScale());
             setUniformf("u_rotation", (float) Math.toRadians(beam.getRotation()));
-            setUniformf("u_origin", temp.getX() / Core.graphics.getWidth(), temp.getY() / Core.graphics.getHeight());
-            setUniformf("u_power", beam.getPower() / 60f);
+            setUniformf("u_origin", temp.getX(), temp.getY());
+            setUniformf("u_power", beam.getPower() * 40f);
         }
 
         public void set(PowerBeam beam){
