@@ -44,7 +44,7 @@ public class Shaders implements ILoadContent{
             setUniformf("u_scale", mindustry.Vars.renderer.getScale());
             setUniformf("u_rotation", (float) Math.toRadians(beam.getRotation()));
             setUniformf("u_origin", temp.getX(), temp.getY());
-            setUniformf("u_power", beam.getPower() * 40f);
+            setUniformf("u_power", beam.getPower() * 35f);
         }
 
         public void set(PowerBeam beam){

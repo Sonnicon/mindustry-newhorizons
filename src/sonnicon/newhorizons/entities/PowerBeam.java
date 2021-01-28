@@ -3,6 +3,7 @@ package sonnicon.newhorizons.entities;
 import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
@@ -75,13 +76,21 @@ public class PowerBeam{
 
     // Move beam and recalculate
     public void set(float x, float y, float rotation, PowerBeam parentBeam){
-        this.x = x;
-        this.y = y;
-        this.rotation = (rotation % 360f + 360f) % 360f;
         if(parentBeam != null){
             this.parentBeam = parentBeam;
             setPower(parentBeam.power);
         }
+        set(x, y, rotation);
+    }
+
+    public void set(float x, float y, float rotation){
+        this.rotation = (rotation % 360f + 360f) % 360f;
+        set(x, y);
+    }
+
+    public void set(float x, float y){
+        this.x = x;
+        this.y = y;
         invalidate();
     }
 
@@ -261,9 +270,11 @@ public class PowerBeam{
 
     // Set power of beam and child beam
     public void setPower(float power){
-        this.power = power;
-        if(hasChild()){
-            childBeam.setPower(power);
+        if(Math.abs(power - getPower()) > 0.01f){
+            this.power = power;
+            if(hasChild()){
+                childBeam.setPower(power);
+            }
         }
     }
 

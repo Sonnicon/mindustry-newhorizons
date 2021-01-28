@@ -1,23 +1,28 @@
-package sonnicon.newhorizons.world.blocks.sandbox;
+package sonnicon.newhorizons.world.blocks.beam;
 
-import arc.scene.ui.layout.Table;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
 import mindustry.Vars;
+import mindustry.content.Liquids;
 import mindustry.gen.Building;
 import mindustry.world.Block;
+import mindustry.world.consumers.ConsumeLiquid;
 import sonnicon.newhorizons.core.Util;
 import sonnicon.newhorizons.entities.PowerBeam;
 import sonnicon.newhorizons.types.Pair;
 
-public class BlockPowerBeamSpawner extends Block{
-    public BlockPowerBeamSpawner(String name){
+public class BlockPowerBeamEmitter extends Block{
+    public BlockPowerBeamEmitter(String name){
         super(name);
 
         destructible = true;
         solid = true;
-        configurable = true;
         rotate = true;
+        update = true;
+        hasLiquids = true;
+        outputsLiquid = false;
+        hasPower = true;
+        canOverdrive = false;
+        consumes.add(new ConsumeLiquid(Liquids.cryofluid, 0.05f));
+        consumes.power(1f);
 
         config(Float.class, BuildingPowerBeamSpawner::configure);
     }
@@ -26,22 +31,15 @@ public class BlockPowerBeamSpawner extends Block{
 
     public class BuildingPowerBeamSpawner extends Building{
         protected PowerBeam beam;
-        protected float power = 0f;
 
         @Override
-        public void buildConfiguration(Table table){
-            table.field(String.valueOf(config()), (textField, c) -> Character.isDigit(c) || c == '.', input -> configure(Float.parseFloat("0" + input)));
-        }
-
-        @Override
-        public Float config(){
-            return power;
-        }
-
-        @Override
-        public void configure(Object value){
-            power = (Float) value;
-            beam.setPower(power);
+        public void updateTile(){
+            if(cons.valid()){
+                beam.setPower(0.1f);
+                consume();
+            }else{
+                beam.setPower(0f);
+            }
         }
 
         @Override
@@ -65,18 +63,6 @@ public class BlockPowerBeamSpawner extends Block{
         public void onRemoved(){
             super.onRemoved();
             beam.remove();
-        }
-
-        @Override
-        public void write(Writes write){
-            super.write(write);
-            write.f(power);
-        }
-
-        @Override
-        public void read(Reads read, byte revision){
-            super.read(read, revision);
-            configure(power);
         }
     }
 }
