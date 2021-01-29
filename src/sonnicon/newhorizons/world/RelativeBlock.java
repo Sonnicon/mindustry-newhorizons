@@ -47,10 +47,10 @@ public class RelativeBlock{
     }
 
     // Return offset tile with rotation
-    public Tile fetch(Tile origin){
+    public Tile fetch(Tile origin, int rotation){
         int offsetX = x, offsetY = y;
-        if(origin.build != null && origin.build.block().rotate){
-            switch(origin.build.rotation()){
+        if(origin.block().rotate){
+            switch(rotation){
                 case (1):{
                     offsetX = -y;
                     //noinspection SuspiciousNameCombination
@@ -70,8 +70,15 @@ public class RelativeBlock{
                 }
             }
         }
-
         return Vars.world.tile(origin.x + offsetX, origin.y + offsetY);
+    }
+
+    public Tile fetch(Tile origin){
+        if(origin.block().rotate){
+            return fetch(origin, origin.build.rotation());
+        }else{
+            return Vars.world.tile(origin.x + x, origin.y + y);
+        }
     }
 
     // Draw a transparent preview at offset if needed

@@ -156,20 +156,20 @@ public class PowerBeam{
                 enroute.add(rt);
             }
             last.set(rt);
-            // ew
-            return (rt.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) rt.build).shouldReflectAngle(rotation + 180f)) ||
-                    (rt.build instanceof IPowerBeamCatch && ((IPowerBeamCatch) rt.build).shouldCatch(this))
-                    || rt.block().absorbLasers;
+            endX = rt.worldx();
+            endY = rt.worldy();
+
+            if((rt.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) rt.build).shouldReflectAngle(rotation + 180f)) || rt.block().absorbLasers){
+                return true;
+            }else if(rt.build instanceof IPowerBeamCatch && ((IPowerBeamCatch) rt.build).shouldCatch(this)){
+                ((IPowerBeamCatch) rt.build).addPowerBeam(this);
+                catchPowerBeam = (IPowerBeamCatch) rt.build;
+                return true;
+            }
+            return false;
         });
 
-        // Catch
         Tile lastTile = last.get();
-        endX = lastTile.worldx();
-        endY = lastTile.worldy();
-        if(shouldCatch(lastTile)){
-            ((IPowerBeamCatch) lastTile.build).addPowerBeam(this);
-            catchPowerBeam = (IPowerBeamCatch) lastTile.build;
-        }
 
         // Both lengths to last tile
         if(endX == x){

@@ -11,8 +11,8 @@ import sonnicon.newhorizons.world.RelativeBlock;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class BlockBeamGeneratorBlock extends PowerGenerator{
-    public BlockBeamGeneratorBlock(String name){
+public class BlockBeamGenerator extends PowerGenerator{
+    public BlockBeamGenerator(String name){
         super(name);
 
         destructible = true;
@@ -34,13 +34,13 @@ public class BlockBeamGeneratorBlock extends PowerGenerator{
                 kill();
                 return;
             }
-            catchyTile = catchyRelative.fetch(tile());
+            catchyTile = catchyRelative.fetch(tile(), rotation());
         }
 
         @Override
         public float getPowerProduction(){
             //todo balancing
-            return (float) catchedBeams.stream().mapToDouble(PowerBeam::getPower).sum() * efficiency() * 100f;
+            return (float) catchedBeams.stream().mapToDouble(PowerBeam::getPower).sum() * efficiency() * 50f;
         }
 
         @Override

@@ -22,7 +22,7 @@ public class BlockPowerBeamEmitter extends Block{
         hasPower = true;
         canOverdrive = false;
         consumes.add(new ConsumeLiquid(Liquids.cryofluid, 0.05f));
-        consumes.power(1f);
+        consumes.power(15f);
 
         config(Float.class, BuildingPowerBeamSpawner::configure);
     }

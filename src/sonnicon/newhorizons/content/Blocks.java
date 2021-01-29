@@ -43,7 +43,7 @@ public class Blocks implements ILoadContent{
         powerbeamSpawner = new BlockPowerBeamSpawner("powerbeamspawner");
         powerbeamSpawner.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
 
-        beamGenerator = new BlockBeamGeneratorBlock("beamgenerator");
+        beamGenerator = new BlockBeamGenerator("beamgenerator");
         beamGenerator.requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
         beamGenerator.health = 400;
 
