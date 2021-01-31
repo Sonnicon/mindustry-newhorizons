@@ -1,8 +1,8 @@
 package sonnicon.newhorizons.types;
 
-public class Pair<T, S>{
-    protected T x;
-    protected S y;
+public final class Pair<T, S>{
+    private T x;
+    private S y;
 
     public Pair(){}
 
