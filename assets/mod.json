@@ -7,5 +7,6 @@
   "main": "sonnicon.newhorizons.Newhorizons",
   "minGameVersion": "121",
   "dependencies": [],
-  "hidden": false
+  "hidden": false,
+  "java": true
 }
