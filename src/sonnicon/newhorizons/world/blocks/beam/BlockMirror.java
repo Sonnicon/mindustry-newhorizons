@@ -63,7 +63,7 @@ public class BlockMirror extends Block{
         public void configure(Object value){
             setting = (float) value % 360f;
             super.configure(setting);
-            PowerBeam.recalculateAll(tile());
+            tile.getLinkedTiles(PowerBeam::recalculateAll);
         }
 
         @Override

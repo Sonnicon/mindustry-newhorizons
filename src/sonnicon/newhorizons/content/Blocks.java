@@ -5,6 +5,7 @@ import mindustry.type.Category;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 import sonnicon.newhorizons.types.ILoadContent;
+import sonnicon.newhorizons.world.blocks.BlockFloorPanel;
 import sonnicon.newhorizons.world.blocks.BlockMultiblockAssembly;
 import sonnicon.newhorizons.world.blocks.beam.*;
 import sonnicon.newhorizons.world.blocks.crystal.BlockCrystal;
@@ -15,7 +16,7 @@ import sonnicon.newhorizons.world.blocks.sandbox.BlockPowerBeamSpawner;
 import static mindustry.type.ItemStack.with;
 
 public class Blocks implements ILoadContent{
-    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, powerbeamSpawner, beamGenerator, phaseConduitDispenser, beamEmitter;
+    public static Block crystalWhite, mirror, semimirror, multiblockAssemblyBlock, glassWall, laserCondenser, powerbeamSpawner, beamGenerator, phaseConduitDispenser, beamEmitter, floorpanelSilicon;
 
     @Override
     public void loadContent(){
@@ -52,5 +53,8 @@ public class Blocks implements ILoadContent{
 
         beamEmitter = new BlockPowerBeamEmitter("powerbeamemitter");
         beamEmitter.requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
+
+        floorpanelSilicon = new BlockFloorPanel("floorpanelsilicon", Floors.floorSilicon);
+        floorpanelSilicon.requirements(Category.liquid, with(Items.copper, 30, Items.lead, 25));
     }
 }

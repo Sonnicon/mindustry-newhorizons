@@ -1,11 +1,14 @@
 package sonnicon.newhorizons.world;
 
+import arc.Events;
 import mindustry.content.Blocks;
+import mindustry.game.EventType;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.core.Util;
+import sonnicon.newhorizons.entities.PowerBeam;
 
 import java.util.*;
 
@@ -20,6 +23,8 @@ public class Multiblock{
     protected final float drawOffsetX, drawOffsetY;
     // Total build cost
     public final ItemStack[] costs;
+
+    private static final EventType.TileChangeEvent tileChangeEvent = new EventType.TileChangeEvent();
 
     // Every loaded multiblock
     protected static final HashMap<Block, Multiblock> multiblocks = new HashMap<>();
@@ -92,6 +97,8 @@ public class Multiblock{
             origin.build.health(origin.build.health() * health / (temp.size() + 1));
         }
 
+        origin.getLinkedTiles(PowerBeam::recalculateAll);
+
         return true;
     }
 
@@ -101,7 +108,7 @@ public class Multiblock{
             Tile t = b.fetch(origin);
             Util.setTileBlock(t, Blocks.air);
             t.build = null;
-            world.notifyChanged(t);
+            Events.fire(tileChangeEvent.set(t));
         }
     }
 

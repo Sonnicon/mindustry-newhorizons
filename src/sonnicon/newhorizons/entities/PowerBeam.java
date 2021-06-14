@@ -3,6 +3,7 @@ package sonnicon.newhorizons.entities;
 import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import mindustry.Vars;
 import mindustry.game.EventType;
@@ -16,10 +17,7 @@ import sonnicon.newhorizons.types.IPowerBeamDamage;
 import sonnicon.newhorizons.world.blocks.beam.BlockLaserCondenser;
 import sonnicon.newhorizons.world.blocks.beam.BlockMirror;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -37,12 +35,14 @@ public class PowerBeam{
     protected float length, endX, endY;
     // Tiles on beam path (reduce recalculations)
     protected HashSet<Tile> enroute = new HashSet<>();
+    // Stop damaging after recalculation due to damage
+    protected boolean endOfDamage = false;
     // Object currently catching the beam
     protected IPowerBeamCatch catchPowerBeam;
 
     // Register events
-    public static void init(){
-        Events.on(EventType.TileChangeEvent.class, tile -> recalculateAll(tile.tile));
+    public static void initialize(){
+        Events.on(EventType.TileChangeEvent.class, event -> event.tile.getLinkedTiles(PowerBeam::recalculateAll));
 
         Events.on(EventType.ResetEvent.class, event -> {
             while(!beams.isEmpty()){
@@ -107,6 +107,7 @@ public class PowerBeam{
     // Try to recalculate this PowerBeam if it crosses through a tile
     public void recalculate(Tile tile){
         if(tile == null || enroute.contains(tile)){
+            endOfDamage = true;
             recalculate();
         }else if(hasChild()){
             childBeam.recalculate(tile);
@@ -150,11 +151,11 @@ public class PowerBeam{
             if(rt == null) return true;
             if(rt == origin || (origin.block().hasBuilding() && rt.build == origin.build)) return false;
             // Add all of multiblocks
-            if(rt.block().hasBuilding()){
+            /*if(rt.block().hasBuilding()){
                 rt.build.tile().getLinkedTiles(t -> enroute.add(t));
-            }else{
+            }else{*/
                 enroute.add(rt);
-            }
+            //}
             last.set(rt);
             endX = rt.worldx();
             endY = rt.worldy();
@@ -169,8 +170,6 @@ public class PowerBeam{
             return false;
         });
 
-        Tile lastTile = last.get();
-
         // Both lengths to last tile
         if(endX == x){
             length = (endY - y) / (float) Math.sin(Math.toRadians(rotation));
@@ -181,11 +180,12 @@ public class PowerBeam{
 
         // Deal with child beam
         Tile t = last.get();
-        if(t.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) t.build).shouldReflectAngle(rotation + 180f)){
+        if(t.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) t.build).shouldReflectAngle(rotation + 180f) && (!hasParent() || !parentBeam.isParentLoop(this))){
+            float rot = (0f + (float) t.build.config()) * 2f - rotation + 180f;
             if(!hasChild()){
-                childBeam = new PowerBeam(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
+                childBeam = new PowerBeam(endX, endY, rot, this);
             }else{
-                childBeam.set(endX, endY, (0f + (float) t.build.config()) * 2f - rotation + 180f, this);
+                childBeam.set(endX, endY, rot, this);
             }
         }else if(hasChild()){
             childBeam.remove();
@@ -228,9 +228,11 @@ public class PowerBeam{
             return;
         }
 
+        endOfDamage = false;
         Building originBuilding = Vars.world.tileWorld(x, y).block().hasBuilding() ? Vars.world.tileWorld(x, y).build : null;
-        enroute.forEach(tile -> {
-            Building build = tile.build;
+        Iterator<Tile> tiles = enroute.iterator();
+        while(tiles.hasNext() && !endOfDamage){
+            Building build = tiles.next().build;
             if(build != null && build != originBuilding){
                 if(build instanceof IPowerBeamDamage){
                     if(((IPowerBeamDamage) build).shouldDamage(this)){
@@ -240,7 +242,7 @@ public class PowerBeam{
                     damage(build);
                 }
             }
-        });
+        }
     }
 
     public void damage(Building building){
@@ -255,7 +257,9 @@ public class PowerBeam{
         Draw.draw(Layer.effect, () -> {
             Shaders.powerbeam.set(this);
             Draw.shader(Shaders.powerbeam);
-            Drawf.laser(null, Core.atlas.find("blank"), Core.atlas.find("blank"), x, y, endX, endY, power);
+            Lines.stroke(12f * power);
+            Lines.line(x, y , endX, endY, false);
+            Lines.stroke(1f);
             Draw.shader();
         });
         if(hasChild()){
@@ -339,5 +343,10 @@ public class PowerBeam{
             catchPowerBeam.removePowerBeam(this);
             catchPowerBeam = null;
         }
+    }
+
+    protected boolean isParentLoop(PowerBeam beam){
+        return (Math.abs(beam.getEndX() - getX()) < 0.1f && Math.abs(beam.getEndY() - getY()) < 0.1f && Math.abs(beam.getRotation() - getRotation()) < 0.1f) ||
+                (hasParent() && parentBeam.isParentLoop(beam));
     }
 }

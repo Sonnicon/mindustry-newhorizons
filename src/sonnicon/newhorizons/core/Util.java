@@ -1,6 +1,8 @@
 package sonnicon.newhorizons.core;
 
+import arc.Events;
 import arc.util.Log;
+import mindustry.game.EventType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.types.Pair;

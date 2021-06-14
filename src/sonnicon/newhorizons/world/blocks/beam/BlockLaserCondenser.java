@@ -15,7 +15,7 @@ import mindustry.world.Block;
 import mindustry.world.consumers.ConsumeLiquidFilter;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
-import mindustry.world.meta.values.LiquidFilterValue;
+import mindustry.world.meta.StatValues;
 import sonnicon.newhorizons.content.Blocks;
 import sonnicon.newhorizons.content.Types;
 import sonnicon.newhorizons.core.Util;
@@ -64,7 +64,7 @@ public class BlockLaserCondenser extends Block{
             stats.add(Stat.buildTime, s);
             stats.add(Stat.buildCost, s);
         }
-        stats.add(Stat.input, new LiquidFilterValue(coolantFilter, Float.NaN, false));
+        stats.add(Stat.input, StatValues.liquids(coolantFilter, Float.NaN, false));
         stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
     }
 

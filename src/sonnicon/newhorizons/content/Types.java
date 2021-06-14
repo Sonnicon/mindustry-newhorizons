@@ -14,7 +14,7 @@ public class Types implements ILoadInit{
     protected static final HashSet<BulletType> lasers = new HashSet<>();
 
     @Override
-    public void init(){
+    public void initialize(){
         Events.on(EventType.ClientLoadEvent.class, event -> lasers.addAll(
             Vars.content.bullets().select(bulletType ->
                 bulletType instanceof LaserBoltBulletType ||
