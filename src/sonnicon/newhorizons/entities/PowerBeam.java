@@ -1,19 +1,17 @@
 package sonnicon.newhorizons.entities;
 
-import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
-import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 import sonnicon.newhorizons.graphics.Shaders;
 import sonnicon.newhorizons.types.IPowerBeamCatch;
 import sonnicon.newhorizons.types.IPowerBeamDamage;
+import sonnicon.newhorizons.types.IPowerBeamPoly;
 import sonnicon.newhorizons.world.blocks.beam.BlockLaserCondenser;
 import sonnicon.newhorizons.world.blocks.beam.BlockMirror;
 
@@ -31,14 +29,18 @@ public class PowerBeam{
 
     // All loaded beams without parents
     protected static ArrayList<PowerBeam> beams = new ArrayList<>();
-    // End tile
+    // End of beam
     protected float length, endX, endY;
+    // Origin and ending tiles (if applicable)
+    protected Tile startTile, endTile;
     // Tiles on beam path (reduce recalculations)
     protected HashSet<Tile> enroute = new HashSet<>();
     // Stop damaging after recalculation due to damage
     protected boolean endOfDamage = false;
     // Object currently catching the beam
     protected IPowerBeamCatch catchPowerBeam;
+    // Drawing coordinates
+    protected float x1, y1, x2, y2, x3, y3, x4, y4;
 
     // Register events
     public static void initialize(){
@@ -145,17 +147,12 @@ public class PowerBeam{
         AtomicReference<Tile> last = new AtomicReference<>();
         enroute.clear();
         removeCatched();
-        Tile origin = Vars.world.tileWorld(x, y);
+        startTile = Vars.world.tileWorld(x, y);
         Vars.world.raycastEachWorld(x, y, x + distanceX, y + distanceY, (rx, ry) -> {
             Tile rt = Vars.world.tile(rx, ry);
             if(rt == null) return true;
-            if(rt == origin || (origin.block().hasBuilding() && rt.build == origin.build)) return false;
-            // Add all of multiblocks
-            /*if(rt.block().hasBuilding()){
-                rt.build.tile().getLinkedTiles(t -> enroute.add(t));
-            }else{*/
-                enroute.add(rt);
-            //}
+            if(rt == startTile || (startTile.block().hasBuilding() && rt.build == startTile.build)) return false;
+            enroute.add(rt);
             last.set(rt);
             endX = rt.worldx();
             endY = rt.worldy();
@@ -179,9 +176,10 @@ public class PowerBeam{
         length = Math.abs(length);
 
         // Deal with child beam
-        Tile t = last.get();
-        if(t.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) t.build).shouldReflectAngle(rotation + 180f) && (!hasParent() || !parentBeam.isParentLoop(this))){
-            float rot = (0f + (float) t.build.config()) * 2f - rotation + 180f;
+        endTile = last.get();
+        // todo move this to mirror
+        if(endTile.block() instanceof BlockMirror && ((BlockMirror.BuildingMirror) endTile.build).shouldReflectAngle(rotation + 180f) && (!hasParent() || !parentBeam.isParentLoop(this))){
+            float rot = (0f + (float) endTile.build.config()) * 2f - rotation + 180f;
             if(!hasChild()){
                 childBeam = new PowerBeam(endX, endY, rot, this);
             }else{
@@ -191,6 +189,8 @@ public class PowerBeam{
             childBeam.remove();
             childBeam = null;
         }
+
+        calculateDraw();
     }
 
     // Ensure no infinite beam loop
@@ -257,13 +257,44 @@ public class PowerBeam{
         Draw.draw(Layer.effect, () -> {
             Shaders.powerbeam.set(this);
             Draw.shader(Shaders.powerbeam);
-            Lines.stroke(12f * power);
-            Lines.line(x, y , endX, endY, false);
-            Lines.stroke(1f);
+            // poly machine broke
+            // Fill.poly(x1, y1, x2, y2, x3, y3, x4, y4);
+            Fill.tri(x1, y1, x2, y2, x3, y3);
+            Fill.tri(x2, y2, x3, y3, x4, y4);
             Draw.shader();
         });
         if(hasChild()){
             childBeam.draw();
+        }
+    }
+
+    protected void calculateDraw(){
+        // Drawing stuffs
+        float radius = 12f * getPower();
+        setPolyBeam(startTile != null ? startTile.build : null, false, radius);
+        setPolyBeam(endTile != null ? endTile.build : null, true, radius);
+    }
+
+    protected void setPolyBeam(Building building, boolean end, float radius){
+        boolean usePoly = building instanceof IPowerBeamPoly;
+
+        float radians = (float) Math.toRadians(usePoly ? ((IPowerBeamPoly) building).getInterceptRotation(this, end) : getRotation());
+        float sin = (float) (radius * Math.sin(radians));
+        float cos = (float) (radius * Math.cos(radians));
+
+        float tempx = usePoly ? ((IPowerBeamPoly) building).getInterceptX(this, end) : (end ? getEndX() : getX());
+        float tempy = usePoly ? ((IPowerBeamPoly) building).getInterceptY(this, end) : (end ? getEndY() : getY());
+
+        if(end){
+            x1 = tempx + sin;
+            y1 = tempy + cos;
+            x2 = tempx - sin;
+            y2 = tempy - cos;
+        }else{
+            x3 = tempx + sin;
+            y3 = tempy + cos;
+            x4 = tempx - sin;
+            y4 = tempy - cos;
         }
     }
 
@@ -280,6 +311,8 @@ public class PowerBeam{
                 childBeam.setPower(power);
             }
         }
+
+        calculateDraw();
     }
 
     public float getPower(){
