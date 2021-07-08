@@ -46,7 +46,7 @@ public class BlockPowerBeamSpawner extends Block{
 
         @Override
         public void created(){
-            Util.blockRotationOffset(temp, x, y, Vars.tilesize * size * .5f, rotation);
+            Util.blockRotationOffset(temp, x, y, Vars.tilesize * size * 0.5f, rotation);
             beam = new PowerBeam(temp.getX(), temp.getY(), (4 - rotation()) * 90f);
         }
 
@@ -55,9 +55,8 @@ public class BlockPowerBeamSpawner extends Block{
             super.onProximityUpdate();
             float rot = (4 - rotation()) * 90f;
             if(rot != beam.getRotation()){
-                beam.setRotation(rot);
                 Util.blockRotationOffset(temp, x, y, Vars.tilesize * size * .5f, rotation);
-                beam.set(x, y);
+                beam.set(temp.getX(), temp.getY(), rot);
             }
         }
 
